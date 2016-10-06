@@ -49,13 +49,7 @@ public class Door : MonoBehaviour, IClickable
         if (Lock.locked)
         {
             Debug.Log("Door is locked proceed unlocking");
-            while (true)
-            {
-                if (queue.Count > 0)
-                    yield return StartCoroutine(queue.Dequeue());
-                //else
-                   // yield return null;
-            }
+            yield return StartCoroutine(queue.Dequeue());
         }
         if (opened)
         {
