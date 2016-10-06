@@ -4,8 +4,7 @@ using System.Collections;
 
 public class Guard : Character
 {
-    private bool conscious = true;
-    private bool stunned = false;
+    private Animator myAnimator;
 
     public enum GuardState {Conscious, Unconscious, Stunned, Alert};
     public GuardState MyGuardState = GuardState.Conscious;
@@ -13,16 +12,17 @@ public class Guard : Character
     {
         int coin;
         bool key;
-
     }
 
 	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
+	void Start ()
+	{
+        myAnimator = transform.parent.GetComponent<Animator>();
+        myAnimator.SetBool("Conscious", true);
+    }
+
+    // Update is called once per frame
+    void Update () {
 	
 	}
 
@@ -34,8 +34,10 @@ public class Guard : Character
 
     public IEnumerator GetBlackJacked()
     {
-        yield return new WaitForSeconds(1f);
         ChangeState(GuardState.Unconscious);
+        myAnimator.SetBool("Conscious", false);
+        yield return new WaitForSeconds(2f);
+        Debug.Log("Guard Unconscious");
     }
 
     IEnumerator GetPickPocketed()

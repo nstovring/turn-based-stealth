@@ -29,7 +29,6 @@ public class InputManager : MonoBehaviour
             var clickable = monohit as IClickable;
             if (clickable != null)
             {
-                //IClickable iClickable = clickable;
                 clickable.Clicked();
             }
         }

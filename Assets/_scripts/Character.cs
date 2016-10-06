@@ -17,6 +17,7 @@ public class Character : MonoBehaviour
         actions.Enqueue(TestDoor.Action());
         actions.Enqueue(TestGuard.GetBlackJacked());
         actions.Enqueue(TestDoor.Action());
+        actions.Enqueue(TestDoor.Action());
     }
 
     // Update is called once per frame
