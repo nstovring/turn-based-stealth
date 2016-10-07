@@ -9,23 +9,17 @@ public class Character : MonoBehaviour
 
     public Queue<IEnumerator> actions = new Queue<IEnumerator>();
     public Coroutine myCoroutine;
-    public Door TestDoor;
-    public Guard TestGuard;
-	// Use this for initialization
-	void Start ()
-	{
-        actions.Enqueue(TestDoor.Action());
-        actions.Enqueue(TestGuard.GetBlackJacked());
-        actions.Enqueue(TestDoor.Action());
-    }
+   
 
     // Update is called once per frame
     void Update () {
-	    if (Input.anyKeyDown)
-	    {
-            StartActions();
-	    }
+	  
 	}
+
+    public void AddActionToQueue(IEnumerator action)
+    {
+        actions.Enqueue(action);
+    }
 
     public void StartActions()
     {
