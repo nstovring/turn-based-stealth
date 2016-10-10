@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-
+[ExecuteInEditMode]
 public class WorldCreator : MonoBehaviour {
 
     public GameObject gridCellPrefab;
@@ -8,40 +8,51 @@ public class WorldCreator : MonoBehaviour {
     Transform cellTransform;
     public int gridSize;
     public int gridMidPos;
+    bool gridIsCreated = false;
 
     // Use this for initialization
     void Start () {
-        cellTransform = gridCellPrefab.transform;
-        
-        CreateGrid(gridMidPos, gridMidPos, gridSize, gridSize);
+        //cellTransform = gridCellPrefab.transform;
+        //CreateGrid(gridMidPos, gridMidPos, gridSize, gridSize);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-    void CreateGrid(float PosX, float PosZ, int LengthX, int LengthZ)
+    public void CreateGrid()
     {
-        if (LengthX % 2 != 0 && LengthZ % 2 != 0)
+        if (!gridIsCreated)
         {
-            for (int x = 0; x < LengthX; x++)
+            cellTransform = gridCellPrefab.transform;
+            if (gridSize % 2 != 0 && gridSize % 2 != 0)
             {
-                for (int z = 0; z < LengthZ; z++)
+                for (int x = 0; x < gridSize; x++)
                 {
-                    GameObject temp = Instantiate(gridCellPrefab, new Vector3(PosX -(LengthX/2 * cellTransform.localScale.x) + x * cellTransform.localScale.x, 0, PosZ - (LengthZ / 2 * cellTransform.localScale.z) + z * cellTransform.localScale.z), Quaternion.identity) as GameObject;
-                    temp.transform.parent = worldCreator.transform;
+                    for (int z = 0; z < gridSize; z++)
+                    {
+                        GameObject temp = Instantiate(gridCellPrefab, new Vector3(gridMidPos - (gridSize / 2 * cellTransform.localScale.x) + x * cellTransform.localScale.x, 0, gridMidPos - (gridSize / 2 * cellTransform.localScale.z) + z * cellTransform.localScale.z), Quaternion.identity) as GameObject;
+                        temp.transform.parent = worldCreator.transform;
+                    }
                 }
+                gridIsCreated = true;
             }
+            else
+            {
+                for (int x = -gridSize / 2; x < gridSize / 2; x++)
+                {
+                    for (int z = -gridSize / 2; z < gridSize / 2; z++)
+                    {
+                        GameObject temp = Instantiate(gridCellPrefab, new Vector3(gridMidPos + x * cellTransform.localScale.x + cellTransform.localScale.x / 2, 0, gridMidPos + z * cellTransform.localScale.z + cellTransform.localScale.z / 2), Quaternion.identity) as GameObject;
+                        temp.transform.parent = worldCreator.transform;
+                    }
+                }
+                gridIsCreated = true;
+            }
+
         }
         else{
-            for (int x = -LengthX / 2; x < LengthX / 2; x++)
+            for(int i = transform.childCount-1; i > -1; i--)
             {
-                for (int z = -LengthZ / 2; z < LengthZ / 2; z++)
-                {
-                    GameObject temp = Instantiate(gridCellPrefab, new Vector3(PosX + x * cellTransform.localScale.x + cellTransform.localScale.x/2, 0, PosZ + z * cellTransform.localScale.z + cellTransform.localScale.z / 2), Quaternion.identity) as GameObject;
-                    temp.transform.parent = worldCreator.transform;
-                }
+                DestroyImmediate(transform.GetChild(i).gameObject);
             }
+            gridIsCreated = false;
+            
         }
     }
 }
