@@ -27,6 +27,7 @@ public class WorldCreator : MonoBehaviour {
                     for (int z = 0; z < gridSize; z++)
                     {
                         GameObject temp = Instantiate(gridCellPrefab, new Vector3(gridMidPos - (gridSize / 2 * cellTransform.localScale.x) + x * cellTransform.localScale.x, 0, gridMidPos - (gridSize / 2 * cellTransform.localScale.z) + z * cellTransform.localScale.z), Quaternion.identity) as GameObject;
+                        temp.transform.name += " :" + x+"; "+z;
                         temp.transform.parent = worldCreator.transform;
                     }
                 }

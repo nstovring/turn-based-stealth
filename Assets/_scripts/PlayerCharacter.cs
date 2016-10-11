@@ -12,10 +12,16 @@ public class PlayerCharacter : Character
     // Use this for initialization
     void Start()
     {
+        Initialize();
+        //GetPathfindingVector3s(TestGrid.transform.position);
+        AddActionToQueue(Move(GetCellTransform(TestGrid.transform)));
+        AddActionToQueue(Move(GetCellTransform(TestGrid.transform)));
+        AddActionToQueue(Move(GetCellTransform(TestGrid.transform)));
+
         //AddActionToQueue(TestDoor.Action());
         //AddActionToQueue(TestGuard.GetBlackJacked());
         //AddActionToQueue(TestItem.GetStolen());
-        AddActionToQueue(Move(TestGrid.transform));
+        //AddActionToQueue(Move(TestGrid.transform));
         AddActionToQueue(TestDoor.Action());
     }
 	// Update is called once per frame
@@ -26,8 +32,8 @@ public class PlayerCharacter : Character
         {
             StartActions();
         }
-    }
 
+    }
    
 
     void updatePosition()

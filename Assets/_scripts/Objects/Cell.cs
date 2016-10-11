@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Cell : MonoBehaviour {
+public class Cell : MonoBehaviour, IClickable {
     public bool isOccupied;
 	// Use this for initialization
 	void Start () {
@@ -12,4 +12,9 @@ public class Cell : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void Clicked()
+    {
+        throw new System.NotImplementedException();
+    }
 }

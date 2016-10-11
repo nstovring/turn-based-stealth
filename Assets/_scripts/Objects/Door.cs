@@ -29,7 +29,7 @@ public class Door : MonoBehaviour, IClickable
         opened = false;
        
         yield return new WaitForSeconds(1f);
-        Debug.Log("Door Opened");
+        //Debug.Log("Door Opened");
         opened = true;
     }
 
@@ -39,7 +39,7 @@ public class Door : MonoBehaviour, IClickable
         opened = true;
 
         yield return new WaitForSeconds(1f);
-        Debug.Log("Door Closed");
+        //Debug.Log("Door Closed");
         opened = false;
     }
 
@@ -48,7 +48,7 @@ public class Door : MonoBehaviour, IClickable
     {
         if (Lock.locked)
         {
-            Debug.Log("Door is locked proceed unlocking");
+            //Debug.Log("Door is locked proceed unlocking");
             yield return StartCoroutine(queue.Dequeue());
         }
         if (opened)
@@ -77,7 +77,7 @@ public class Lock
     public IEnumerator PickLock()
     {
         yield return new WaitForSeconds(unlockTime);
-        Debug.Log("Door Unlocked");
+        //Debug.Log("Door Unlocked");
         locked = false;
     }
 }
