@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Debug = UnityEngine.Debug;
 
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour, IClickable
 {
     public int actionPoints;
     public Queue<IEnumerator> actions = new Queue<IEnumerator>();
@@ -21,59 +21,44 @@ public class Character : MonoBehaviour
         Backwards
     };
 
-    public void Initialize()
-    {
-        myAgent = transform.GetComponent<NavMeshAgent>();
-    }
-
-
     public float AngleDir(Vector3 fwd, Vector3 targetDir, Vector3 up)
     {
         Vector3 perp = Vector3.Cross(fwd, targetDir);
         float dir = Vector3.Dot(perp, up);
-
         if (dir > 0.0f)
         {
             return 1.0f;
         }
-        else if (dir < 0.0f)
+        if (dir < 0.0f)
         {
             return -1.0f;
         }
-        else
-        {
-            return 0.0f;
-        }
+        return 0.0f;
     }
 
-    public Vector3 GetDirection(Vector3 desiredVelocity)
+    public Vector3 GetDirection(Vector3 desiredDirection)
     {
-        float angle = Vector3.Angle(transform.forward, desiredVelocity);
-        Debug.Log(angle);
+        float angle = Vector3.Angle(transform.forward, desiredDirection);
         if (angle > 135)
         {
-            Debug.Log("Go Backwards");
             return transform.forward * -1;
         }
         if (angle < 45)
         {
-            Debug.Log("Go Forwards");
             return transform.forward;
         }
-        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredVelocity, transform.up) > 0)
+        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) > 0)
         {
-            Debug.Log("Go Left");
             return transform.right;
         }
-        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredVelocity, transform.up) < 1)
+        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) < 1)
         {
-            Debug.Log("Go Right");
             return transform.right * -1;
         }
+        Debug.Log("No valid Direction Found!");
         return Vector3.zero;
     }
 
-    private Vector3 desiredDirection;
 
     public Vector3[] GetPathfindingVector3s(Vector3 targetPosition)
     {
@@ -81,16 +66,14 @@ public class Character : MonoBehaviour
         NavMeshPath tempPath = new NavMeshPath();
         myAgent.CalculatePath(targetPosition, tempPath);
         myAgent.path = tempPath;
-        desiredDirection = myAgent.desiredVelocity;
         myAgent.Stop();
         return tempPath.corners;
     }
 
 
-    public Transform GetCellTransform(Transform endPosition)
+    public Transform GetClosestCellTransform(Transform endPosition)
     {
         RaycastHit hit;
-        int endLength = GetPathfindingVector3s(endPosition.position).Length;
         Vector3 cornerDirection = GetPathfindingVector3s(endPosition.position)[1] - transform.position;
         Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection);
         Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
@@ -131,6 +114,15 @@ public class Character : MonoBehaviour
         }
     }
 
+    public IEnumerator AddMoveActionsToQueue(Transform finalDestination)
+    {
+        Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
+        while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f)
+        {
+            yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
+        }
+    }
+
     public IEnumerator Move(Transform destination)
     {
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
@@ -148,5 +140,15 @@ public class Character : MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
         }
+    }
+
+    public void LeftClicked()
+    {
+        throw new NotImplementedException();
+    }
+
+    public void RightClicked()
+    {
+        throw new NotImplementedException();
     }
 }

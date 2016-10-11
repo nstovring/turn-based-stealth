@@ -4,7 +4,7 @@ using System.Collections;
 public class Item : MonoBehaviour, IClickable, IStealable
 {
     public int value;
-    public void Clicked()
+    public void LeftClicked()
     {
         //If player next to object getstolen
 
@@ -12,12 +12,17 @@ public class Item : MonoBehaviour, IClickable, IStealable
         throw new System.NotImplementedException();
     }
 
-    public IEnumerator GetStolen()
+    public void RightClicked()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public IEnumerator GetStolen(Vector3 playerVector3)
     {
         //Run animation
-        while (Vector3.Distance(transform.position, PlayerCharacter.playerVector3)> 0.1)
+        while (Vector3.Distance(transform.position, playerVector3)> 0.1)
         {
-            transform.position = Vector3.Lerp(transform.position, PlayerCharacter.playerVector3, 0.1f);
+            transform.position = Vector3.Lerp(transform.position, playerVector3, 0.1f);
             yield return new WaitForEndOfFrame();
         }
         //Add value to score

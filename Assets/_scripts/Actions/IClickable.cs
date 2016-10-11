@@ -3,6 +3,6 @@ using System.Collections;
 
 public interface IClickable{
 
-    void Clicked();
-	
+    void LeftClicked();
+    void RightClicked();
 }

@@ -61,7 +61,12 @@ public class Door : MonoBehaviour, IClickable
         }
     }
 
-    public void Clicked()
+    public void LeftClicked()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void RightClicked()
     {
         throw new System.NotImplementedException();
     }

@@ -15,11 +15,15 @@ public class InputManager : MonoBehaviour
 	void Update () {
 	    if (Input.GetMouseButtonUp(0))
 	    {
-	        Click();
+	        LeftClick();
 	    }
-	}
+        if (Input.GetMouseButtonUp(1))
+        {
+            //RightClick();
+        }
+    }
     //Method sends raycast and checks if object hit is Clickable if so run the clicked method
-    void Click()
+    void LeftClick()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -29,7 +33,7 @@ public class InputManager : MonoBehaviour
             var clickable = monohit as IClickable;
             if (clickable != null)
             {
-                clickable.Clicked();
+                clickable.LeftClicked();
             }
         }
     }
