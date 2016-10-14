@@ -126,7 +126,7 @@ public class Character : MonoBehaviour, IClickable
         }
     }
 
-    public IEnumerator QueuedMove(Transform finalDestination)
+    public virtual IEnumerator QueuedMove(Transform finalDestination)
     {
         Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
         while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f && ActionPointsLeft())
@@ -135,14 +135,13 @@ public class Character : MonoBehaviour, IClickable
         }
     }
 
-    public IEnumerator Move(Transform destination)
+    public virtual IEnumerator Move(Transform destination)
     {
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
         Vector3 relativePos = tempDestination - transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
         while (Vector3.Angle(transform.forward, tempDestination - transform.position) > 0.1f)
         {
-           
             transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 0.2f);
             yield return new WaitForEndOfFrame();
         }
@@ -163,22 +162,8 @@ public class Character : MonoBehaviour, IClickable
         yield return new WaitForEndOfFrame();
     }
 
-   
 
-    IEnumerator moveToNextGrid(Vector3 tempDestination, Transform destination)
-    {
-        if (Vector3.Distance(transform.position, tempDestination) <= 0.1f)
-        {
-            transform.position = tempDestination;
-            currentCell.isOccupied = false;
-            currentCell = destination.GetComponent<Cell>();
-            currentCell.isOccupied = true;
-            Debug.Log("reached destination");
-            yield return new WaitForEndOfFrame();
-            //Maybe this method should recursively call itself if end destination hasnt been reached
-        }
-    }
-
+  
     public void LeftClicked()
     {
         throw new NotImplementedException();
@@ -190,21 +175,12 @@ public class Character : MonoBehaviour, IClickable
     }
     public void newActions()
     {
-        actions = new Queue<IEnumerator>();
+        //actions = new Queue<IEnumerator>();
         actionPoints = totalActionPoints;
     }
     public bool ActionPointsLeft() {
-        if(actionPoints < 0)
+        if (actionPoints == 0)
         {
-            IEnumerator lastAction = actions.Dequeue();
-            newActions();
-            actions.Enqueue(lastAction);
-            return false;
-        }
-
-        else if (actionPoints == 0)
-        {
-            newActions();
             return false;
         }
         else

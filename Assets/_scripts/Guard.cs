@@ -19,10 +19,11 @@ public class Guard : Character
 	// Use this for initialization
 	IEnumerator Start ()
 	{
+        GameManager.Instance.AddGuardCharacters(this);
         GetCurrentCell();
+        newActions();
         myAnimator = GetComponentInChildren<Animator>();
         myAnimator.SetBool("Conscious", true);
-        //AddActionToQueue(IterateThroughPatrolRoutes());
         AddActionToQueue(IterateThroughPatrolRoutes());
 	    yield return new WaitForSeconds(0.1f);
         StartActions();
@@ -42,22 +43,30 @@ public class Guard : Character
         }
     }
 
-    private int i = 0;
+    public int patrolint = 0;
     IEnumerator IterateThroughPatrolRoutes()
     {
-        currentTarget = patrolTransforms[i % patrolTransforms.Length];
+        currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
 
         while (Vector3.Distance(transform.position, currentTarget.position) > 0.1)
         {
-            currentTarget = patrolTransforms[i % patrolTransforms.Length];
+            currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
+            if (Vector3.Distance(transform.position, currentTarget.position) < 1)
+            {
+                patrolint++;
+            }
             yield return StartCoroutine(QueuedMove(currentTarget));
-            i++;
         }
+
+      
     }
 
     // Update is called once per frame
     void Update () {
-      
+        if (!ActionPointsLeft())
+        {
+           // GameManager.Instance.givePlayerActions();
+        }
     }
 
 
@@ -68,10 +77,15 @@ public class Guard : Character
 
     public IEnumerator GetBlackJacked()
     {
-        ChangeState(GuardState.Unconscious);
-        myAnimator.SetBool("Conscious", false);
-        yield return new WaitForSeconds(2f);
-        Debug.Log("Guard Unconscious");
+        if (GameManager.Instance.PlayerCharacters[0].ActionPointsLeft())
+        {
+            ChangeState(GuardState.Unconscious);
+            myAnimator.SetBool("Conscious", false);
+            yield return new WaitForSeconds(2f);
+            Debug.Log("Guard Unconscious");
+            GameManager.Instance.PlayerCharacters[0].actionPoints--;
+        }
+
     }
 
     IEnumerator GetPickPocketed()

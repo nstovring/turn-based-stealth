@@ -73,7 +73,7 @@ public class Door : MonoBehaviour, IClickable
         else
         {
             //else queue movement to nearest grid
-            character.AddActionToQueue(character.QueuedMove(transform));
+            character.AddActionToQueue(character.QueuedMove(myCell.transform));
             character.AddActionToQueue(Action());
         }
         character.StartActions();

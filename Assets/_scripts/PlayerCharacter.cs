@@ -8,8 +8,14 @@ public class PlayerCharacter : Character
     void Start()
     {
         Initialize();
-        totalActionPoints = 3;
         newActions();
+    }
+
+    public override IEnumerator Move(Transform destination)
+    {
+        if(GameManager.Instance.instantTurnBased)
+        GameManager.Instance.giveGuardsActions();
+        return base.Move(destination);
     }
 
     void Initialize()
@@ -19,9 +25,13 @@ public class PlayerCharacter : Character
     // Update is called once per frame
     void Update ()
 	{
+        if (!ActionPointsLeft())
+        {
+            //GameManager.Instance.giveGuardsActions();
+        }
         if (Input.GetKeyUp(KeyCode.S))
         {
-            StartActions();
+            newActions();
         }
     }
 }

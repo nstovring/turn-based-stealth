@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public List<Character> PlayerCharacters;
+    public List<Character> GuardCharacters;
+
+    public bool instantTurnBased;
 
     public AIManager aiManager;
     public UserInterfaceManager uiManager;
@@ -27,15 +30,82 @@ public class GameManager : MonoBehaviour
             PlayerCharacters = new List<Character>();
         PlayerCharacters.Add(character);
     }
-	
+
+    public void AddGuardCharacters(Character character)
+    {
+        if (GuardCharacters == null)
+            GuardCharacters = new List<Character>();
+        GuardCharacters.Add(character);
+    }
+
     public int ValueStolen
     {
         get { return valueStolen; }
         set { valueStolen = value; }
     }
 
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    private bool playerTurn = true;
+    private bool guardTurn = false;
+
+    public void giveGuardsActions()
+    {
+        foreach (var guardCharacter in GuardCharacters)
+        {
+            guardCharacter.newActions();
+        }
+
+    }
+
+    public void givePlayerActions()
+    {
+        foreach (var playCharacter in PlayerCharacters)
+        {
+            playCharacter.newActions();
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
+        if (!instantTurnBased)
+        {
+            CharacterIterator();
+        }
+    }
+
+    public void CharacterIterator()
+    {
+        if (AllActionsSpend())
+        {
+            playerTurn = !playerTurn;
+            if (playerTurn)
+            {
+                givePlayerActions();
+            }
+            else
+            {
+                giveGuardsActions();
+            }
+        }
+        
+    }
+
+    public bool AllActionsSpend()
+    {
+        foreach (var player in PlayerCharacters)
+        {
+            if (player.ActionPointsLeft())
+            {
+                return false;
+            }
+        }
+        foreach (var guard in GuardCharacters)
+        {
+            if (guard.ActionPointsLeft())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
