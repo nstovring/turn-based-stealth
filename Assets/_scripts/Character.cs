@@ -77,9 +77,9 @@ public class Character : MonoBehaviour, IClickable
     {
         RaycastHit hit;
         Vector3 cornerDirection = GetPathfindingVector3s(endPosition.position)[1] - transform.position;
-        Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection);
-        //Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
-        //Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,30f);
+        Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection)*currentCell.transform.localScale.z;
+        Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
+        Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,30f);
 
         if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
         {
@@ -136,23 +136,43 @@ public class Character : MonoBehaviour, IClickable
     public IEnumerator Move(Transform destination)
     {
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
+        Vector3 relativePos = tempDestination - transform.position;
+        Quaternion rotation = Quaternion.LookRotation(relativePos);
+        while (Vector3.Angle(transform.forward, tempDestination - transform.position) > 0.1f)
+        {
+           
+            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 0.2f);
+            yield return new WaitForEndOfFrame();
+        }
+
+        //transform.rotation = rotation;
         while (Vector3.Distance(transform.position, tempDestination) > 0.1f)
         {
             tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
             transform.position = Vector3.Lerp(transform.position, tempDestination, 0.2f);
-            //transform.position = Vector3.MoveTowards(transform.position, tempDestination, step);
-            //Debug.Log("Moving");
-            if (Vector3.Distance(transform.position, tempDestination) <= 0.1f)
-            {
-                transform.position = tempDestination;
-                currentCell.isOccupied = false;
-                currentCell = destination.GetComponent<Cell>();
-                currentCell.isOccupied = true;
-                Debug.Log("reached destination");
-                yield return new WaitForEndOfFrame();
-                //Maybe this method should recursively call itself if end destination hasnt been reached
-            }
-            //yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+        }
+        transform.position = tempDestination;
+        currentCell.isOccupied = false;
+        currentCell = destination.GetComponent<Cell>();
+        currentCell.isOccupied = true;
+        Debug.Log("reached destination");
+        yield return new WaitForEndOfFrame();
+    }
+
+   
+
+    IEnumerator moveToNextGrid(Vector3 tempDestination, Transform destination)
+    {
+        if (Vector3.Distance(transform.position, tempDestination) <= 0.1f)
+        {
+            transform.position = tempDestination;
+            currentCell.isOccupied = false;
+            currentCell = destination.GetComponent<Cell>();
+            currentCell.isOccupied = true;
+            Debug.Log("reached destination");
+            yield return new WaitForEndOfFrame();
+            //Maybe this method should recursively call itself if end destination hasnt been reached
         }
     }
 
