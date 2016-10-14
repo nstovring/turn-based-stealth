@@ -3,6 +3,6 @@ using System.Collections;
 
 public interface IStealable
 {
-    IEnumerator GetStolen(Vector3 playerVector3);
+    IEnumerator GetStolen(Transform playerTransform);
 
 }

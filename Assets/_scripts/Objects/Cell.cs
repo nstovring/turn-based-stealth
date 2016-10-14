@@ -15,7 +15,17 @@ public class Cell : MonoBehaviour, IClickable {
 
     public void LeftClicked()
     {
-        throw new System.NotImplementedException();
+        Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
+        //If player next to object getstolen
+        if (character.currentCell == this)
+        {
+            return;
+        }
+        //else queue movement to nearest grid
+        character.AddActionToQueue(character.QueuedMove(transform));
+        
+        character.StartActions();
+        //throw new System.NotImplementedException();
     }
 
     public void RightClicked()

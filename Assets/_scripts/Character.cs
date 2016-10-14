@@ -62,11 +62,13 @@ public class Character : MonoBehaviour, IClickable
 
     public Vector3[] GetPathfindingVector3s(Vector3 targetPosition)
     {
+        myAgent.enabled = true;
         myAgent.Resume();
         NavMeshPath tempPath = new NavMeshPath();
         myAgent.CalculatePath(targetPosition, tempPath);
         myAgent.path = tempPath;
         myAgent.Stop();
+        myAgent.enabled = false;
         return tempPath.corners;
     }
 
@@ -76,11 +78,12 @@ public class Character : MonoBehaviour, IClickable
         RaycastHit hit;
         Vector3 cornerDirection = GetPathfindingVector3s(endPosition.position)[1] - transform.position;
         Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection);
-        Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
-        Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,30f);
+        //Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
+        //Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,30f);
 
-        if (Physics.Raycast(tempPosVector3, Vector3.down, out hit))
+        if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
         {
+            Debug.Log("Got transform");
             return hit.transform;
         }
         return null;
@@ -108,13 +111,20 @@ public class Character : MonoBehaviour, IClickable
         while (true)
         {
             if (actions.Count > 0)
+            {
                 yield return StartCoroutine(actions.Dequeue());
+            }
             else
-                yield return null;
+            {
+                Debug.Log("All Actions Complete");
+                CancelActions();
+                break;
+                //yield return null;
+            }
         }
     }
 
-    public IEnumerator AddMoveActionsToQueue(Transform finalDestination)
+    public IEnumerator QueuedMove(Transform finalDestination)
     {
         Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
         while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f)
@@ -129,16 +139,20 @@ public class Character : MonoBehaviour, IClickable
         while (Vector3.Distance(transform.position, tempDestination) > 0.1f)
         {
             tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
-            transform.position = Vector3.Lerp(transform.position, tempDestination, 0.1f);
+            transform.position = Vector3.Lerp(transform.position, tempDestination, 0.2f);
+            //transform.position = Vector3.MoveTowards(transform.position, tempDestination, step);
+            //Debug.Log("Moving");
             if (Vector3.Distance(transform.position, tempDestination) <= 0.1f)
             {
                 transform.position = tempDestination;
                 currentCell.isOccupied = false;
                 currentCell = destination.GetComponent<Cell>();
                 currentCell.isOccupied = true;
-
+                Debug.Log("reached destination");
+                yield return new WaitForEndOfFrame();
+                //Maybe this method should recursively call itself if end destination hasnt been reached
             }
-            yield return new WaitForEndOfFrame();
+            //yield return new WaitForEndOfFrame();
         }
     }
 

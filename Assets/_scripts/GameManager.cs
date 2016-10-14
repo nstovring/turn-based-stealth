@@ -1,20 +1,32 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;
+    public static GameManager Instance;
+
+    public List<Character> PlayerCharacters;
 
     public AIManager aiManager;
     public UserInterfaceManager uiManager;
     public InputManager inputManager;
-	// Use this for initialization
+
+    public int currentPlayer = 0;
     private int valueStolen;
     
 	void Start ()
 	{
-	    instance = this;
+        PlayerCharacters = new List<Character>();
+	    Instance = this;
 	}
+
+    public void AddPlayerCharacters(Character character)
+    {
+        if(PlayerCharacters == null)
+            PlayerCharacters = new List<Character>();
+        PlayerCharacters.Add(character);
+    }
 	
     public int ValueStolen
     {

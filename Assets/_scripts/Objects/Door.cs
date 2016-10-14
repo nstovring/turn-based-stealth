@@ -9,7 +9,7 @@ public class Door : MonoBehaviour, IClickable
     private bool opened = false;
     private Animator myAnimator;
     private Queue<IEnumerator> queue = new Queue<IEnumerator>();
-
+    public Cell myCell;
     // Use this for initialization
     void Start()
     {
@@ -63,7 +63,20 @@ public class Door : MonoBehaviour, IClickable
 
     public void LeftClicked()
     {
-        throw new System.NotImplementedException();
+        Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
+        //If player next to door open/picklock door
+        if (character.currentCell == myCell)
+        {
+            character.AddActionToQueue(Action());
+            return;
+        }
+        else
+        {
+            //else queue movement to nearest grid
+            character.AddActionToQueue(character.QueuedMove(transform));
+            character.AddActionToQueue(Action());
+        }
+        character.StartActions();
     }
 
     public void RightClicked()
