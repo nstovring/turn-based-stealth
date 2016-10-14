@@ -5,7 +5,7 @@ public class Item : MonoBehaviour, IClickable, IStealable
 {
     public int value;
 
-    public Cell CurrentCell;
+    public Cell currentCell;
 
 
     void Start()
@@ -22,7 +22,7 @@ public class Item : MonoBehaviour, IClickable, IStealable
             var cell = monohit as Cell;
             if (cell != null)
             {
-                CurrentCell = cell;
+                currentCell = cell;
             }
         }
     }
@@ -31,7 +31,7 @@ public class Item : MonoBehaviour, IClickable, IStealable
     {
         Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
         //If player next to object getstolen
-        if (character.currentCell == CurrentCell)
+        if (character.currentCell == currentCell)
         {
             character.AddActionToQueue(GetStolen(character.transform));
         }

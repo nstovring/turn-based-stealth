@@ -14,17 +14,50 @@ public class Guard : Character
         bool key;
     }
 
+    public Transform[] patrolTransforms;
+    private Transform currentTarget;
 	// Use this for initialization
 	void Start ()
 	{
-        myAnimator = transform.parent.GetComponent<Animator>();
+        GetCurrentCell();
+        myAnimator = GetComponentInChildren<Animator>();
         myAnimator.SetBool("Conscious", true);
+        //AddActionToQueue(IterateThroughPatrolRoutes());
+        AddActionToQueue(IterateThroughPatrolRoutes());
+        StartActions();
+    }
+
+    private void GetCurrentCell()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + transform.up * 1, transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
+        {
+            MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
+            var cell = monohit as Cell;
+            if (cell != null)
+            {
+                currentCell = cell;
+            }
+        }
+    }
+
+    private int i = 0;
+    IEnumerator IterateThroughPatrolRoutes()
+    {
+        currentTarget = patrolTransforms[i % patrolTransforms.Length];
+
+        while (Vector3.Distance(transform.position, currentTarget.position) > 0.1)
+        {
+            currentTarget = patrolTransforms[i % patrolTransforms.Length];
+            yield return StartCoroutine(QueuedMove(currentTarget));
+            i++;
+        }
     }
 
     // Update is called once per frame
     void Update () {
-	
-	}
+      
+    }
 
 
     void ChangeState(GuardState newState)
