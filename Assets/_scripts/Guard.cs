@@ -17,13 +17,14 @@ public class Guard : Character
     public Transform[] patrolTransforms;
     private Transform currentTarget;
 	// Use this for initialization
-	void Start ()
+	IEnumerator Start ()
 	{
         GetCurrentCell();
         myAnimator = GetComponentInChildren<Animator>();
         myAnimator.SetBool("Conscious", true);
         //AddActionToQueue(IterateThroughPatrolRoutes());
         AddActionToQueue(IterateThroughPatrolRoutes());
+	    yield return new WaitForSeconds(0.1f);
         StartActions();
     }
 
