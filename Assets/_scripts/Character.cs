@@ -7,6 +7,7 @@ using Debug = UnityEngine.Debug;
 
 public class Character : MonoBehaviour, IClickable
 {
+    public int totalActionPoints;
     public int actionPoints;
     public Queue<IEnumerator> actions = new Queue<IEnumerator>();
     public Coroutine myCoroutine;
@@ -93,6 +94,7 @@ public class Character : MonoBehaviour, IClickable
     public void AddActionToQueue(IEnumerator action)
     {
         actions.Enqueue(action);
+
     }
 
     public void StartActions()
@@ -127,9 +129,9 @@ public class Character : MonoBehaviour, IClickable
     public IEnumerator QueuedMove(Transform finalDestination)
     {
         Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
-        while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f)
+        while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f && ActionPointsLeft())
         {
-            yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
+                yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
         }
     }
 
@@ -157,6 +159,7 @@ public class Character : MonoBehaviour, IClickable
         currentCell = destination.GetComponent<Cell>();
         currentCell.isOccupied = true;
         Debug.Log("reached destination");
+        actionPoints--;
         yield return new WaitForEndOfFrame();
     }
 
@@ -184,5 +187,29 @@ public class Character : MonoBehaviour, IClickable
     public void RightClicked()
     {
         throw new NotImplementedException();
+    }
+    public void newActions()
+    {
+        actions = new Queue<IEnumerator>();
+        actionPoints = totalActionPoints;
+    }
+    public bool ActionPointsLeft() {
+        if(actionPoints < 0)
+        {
+            IEnumerator lastAction = actions.Dequeue();
+            newActions();
+            actions.Enqueue(lastAction);
+            return false;
+        }
+
+        else if (actionPoints == 0)
+        {
+            newActions();
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }

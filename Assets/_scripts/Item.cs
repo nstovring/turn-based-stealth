@@ -50,15 +50,21 @@ public class Item : MonoBehaviour, IClickable, IStealable
 
     public IEnumerator GetStolen(Transform playerTransform)
     {
-        //Run animation
-        while (Vector3.Distance(transform.position, playerTransform.position) > 0.1)
+        if (GameManager.Instance.PlayerCharacters[0].ActionPointsLeft())
         {
-            transform.position = Vector3.Lerp(transform.position, playerTransform.position, 0.1f);
-            yield return new WaitForEndOfFrame();
+            Debug.Log("calling getStolen");
+            //Run animation
+            while (Vector3.Distance(transform.position, playerTransform.position) > 0.1)
+            {
+                transform.position = Vector3.Lerp(transform.position, playerTransform.position, 0.1f);
+                yield return new WaitForEndOfFrame();
+            }
+            //Add value to score
+            GameManager.Instance.ValueStolen += value;
+
+            //Destroy Prefab
+            GameManager.Instance.PlayerCharacters[0].actionPoints--;
+            Destroy(gameObject);
         }
-        //Add value to score
-        GameManager.Instance.ValueStolen += value;
-        //Destroy Prefab
-        Destroy(gameObject);
     }
 }

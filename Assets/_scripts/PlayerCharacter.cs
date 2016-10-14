@@ -8,6 +8,8 @@ public class PlayerCharacter : Character
     void Start()
     {
         Initialize();
+        totalActionPoints = 3;
+        newActions();
     }
 
     void Initialize()
