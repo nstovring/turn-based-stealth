@@ -42,7 +42,6 @@ public class Guard : Character
             if (Vector3.Distance(transform.position, currentTarget.position) < 1)
             {
                 patrolint++;
-                visualizeViewRange(Color.red);
             }
             yield return StartCoroutine(QueuedMove(currentTarget));
         }
@@ -109,10 +108,7 @@ public class Guard : Character
 
     // Update is called once per frame
     void Update () {
-        if (!ActionPointsLeft())
-        {
-           // GameManager.Instance.givePlayerActions();
-        }
+       
     }
 
 
@@ -127,6 +123,7 @@ public class Guard : Character
         {
             ChangeState(GuardState.Unconscious);
             myAnimator.SetBool("Conscious", false);
+            CancelActions();
             yield return new WaitForSeconds(2f);
             Debug.Log("Guard Unconscious");
             GameManager.Instance.PlayerCharacters[0].actionPoints--;
