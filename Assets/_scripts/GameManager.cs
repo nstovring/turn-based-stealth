@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour
 
     public int currentPlayer = 0;
     private int valueStolen;
+    public List<IWinable> objectives = new List<IWinable>();
+
+    public 
     
 	void Start ()
 	{
@@ -106,6 +109,33 @@ public class GameManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public bool AllObjectivesComplete()
+    {
+        bool allComplete = true;
+        foreach(IWinable objective in objectives)
+        {
+            if(objective.HasObjectiveChain() && objective.IsObjectiveComplete())
+            {
+                //update objectives;
+            }
+            if (!objective.IsObjectiveComplete())
+            {
+                allComplete = false;
+                break;
+            }
+            
+        }
+        if (allComplete)
+        {
+            //YOU WIIIN
+        }
+        else
+        {
+            //update UI 
+        }
+        return allComplete;
     }
 
 }

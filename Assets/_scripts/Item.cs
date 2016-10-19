@@ -48,7 +48,7 @@ public class Item : MonoBehaviour, IClickable, IStealable
         throw new System.NotImplementedException();
     }
 
-    public IEnumerator GetStolen(Transform playerTransform)
+    public virtual IEnumerator GetStolen(Transform playerTransform)
     {
         if (GameManager.Instance.PlayerCharacters[0].ActionPointsLeft())
         {

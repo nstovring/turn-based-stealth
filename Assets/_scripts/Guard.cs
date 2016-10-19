@@ -95,7 +95,7 @@ public class Guard : Character
         MyGuardState = newState;
     }
 
-    public IEnumerator GetBlackJacked()
+    public virtual IEnumerator GetBlackJacked()
     {
         if (GameManager.Instance.PlayerCharacters[0].ActionPointsLeft())
         {
