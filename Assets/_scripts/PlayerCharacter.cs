@@ -21,6 +21,7 @@ public class PlayerCharacter : Character
     void Initialize()
     {
         GameManager.Instance.AddPlayerCharacters(this);
+        GetCurrentCell();
     }
     // Update is called once per frame
     void Update ()

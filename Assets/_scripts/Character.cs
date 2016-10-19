@@ -13,14 +13,17 @@ public class Character : MonoBehaviour, IClickable
     public Coroutine myCoroutine;
     public Cell currentCell;
     public NavMeshAgent myAgent;
+    public int coneSize = 5;
 
-    private enum movementDirection
+    public enum orientation
     {
         Forward,
         Right,
         Left,
         Backwards
     };
+
+    public orientation myOrientation;
 
     public float AngleDir(Vector3 fwd, Vector3 targetDir, Vector3 up)
     {
@@ -42,22 +45,40 @@ public class Character : MonoBehaviour, IClickable
         float angle = Vector3.Angle(transform.forward, desiredDirection);
         if (angle > 135)
         {
+            myOrientation = orientation.Backwards;
             return transform.forward * -1;
         }
         if (angle < 45)
         {
+            myOrientation = orientation.Forward;
             return transform.forward;
         }
         if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) > 0)
         {
+            myOrientation = orientation.Right;
             return transform.right;
         }
         if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) < 1)
         {
+            myOrientation = orientation.Left;
             return transform.right * -1;
         }
         Debug.Log("No valid Direction Found!");
         return Vector3.zero;
+    }
+
+    public void GetCurrentCell()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + transform.up * 1, transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
+        {
+            MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
+            var cell = monohit as Cell;
+            if (cell != null)
+            {
+                currentCell = cell;
+            }
+        }
     }
 
 

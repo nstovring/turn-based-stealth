@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Guard : Character
 {
@@ -15,6 +16,7 @@ public class Guard : Character
     }
 
     public Transform[] patrolTransforms;
+    public Transform[] visionCone;
     private Transform currentTarget;
 	// Use this for initialization
 	IEnumerator Start ()
@@ -29,19 +31,7 @@ public class Guard : Character
         StartActions();
     }
 
-    private void GetCurrentCell()
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position + transform.up * 1, transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
-        {
-            MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
-            var cell = monohit as Cell;
-            if (cell != null)
-            {
-                currentCell = cell;
-            }
-        }
-    }
+ 
 
     public int patrolint = 0;
     IEnumerator IterateThroughPatrolRoutes()
@@ -53,12 +43,42 @@ public class Guard : Character
             currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
             if (Vector3.Distance(transform.position, currentTarget.position) < 1)
             {
+                visualizeViewRange();
                 patrolint++;
             }
             yield return StartCoroutine(QueuedMove(currentTarget));
         }
 
       
+    }
+
+    public Transform[] getVisionConeTransforms(int _coneSize)
+    {
+        List<Transform> tempViewConeList = new List<Transform>();
+        RaycastHit hit;
+        Vector3 searchDirection = transform.forward;
+        int sideDirection = 0;
+
+        for (int i = 0; i < _coneSize; i++)
+        {
+            if (Physics.Raycast(currentCell.transform.position + transform.up * 2, searchDirection, LayerMask.GetMask("ViewObstacle")))
+            {
+                Debug.Log("Wall not hit");
+                if (Physics.Raycast(currentCell.transform.position + transform.up * 2 + searchDirection * 2 * i, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
+                {
+                    tempViewConeList.Add(hit.transform);
+                }
+            }
+        }
+        return tempViewConeList.ToArray();
+    }
+
+    public void visualizeViewRange()
+    {
+        foreach (var visionConeTransform in getVisionConeTransforms(coneSize))
+        {
+            visionConeTransform.GetComponent<Renderer>().material.color = Color.red;
+        }
     }
 
     // Update is called once per frame
