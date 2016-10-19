@@ -175,14 +175,19 @@ public class Character : MonoBehaviour, IClickable
             yield return new WaitForEndOfFrame();
         }
         transform.position = tempDestination;
+        ChangeCurrentCell(destination);
+        yield return new WaitForEndOfFrame();
+    }
+    public virtual void ChangeCurrentCell(Transform destination)
+    {
         currentCell.isOccupied = false;
+        currentCell.occupier = null;
         currentCell = destination.GetComponent<Cell>();
+        currentCell.occupier = transform;
         currentCell.isOccupied = true;
         Debug.Log("reached destination");
         actionPoints--;
-        yield return new WaitForEndOfFrame();
     }
-
 
   
     public void LeftClicked()

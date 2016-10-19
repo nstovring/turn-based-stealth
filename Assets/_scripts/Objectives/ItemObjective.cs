@@ -6,6 +6,12 @@ public class ItemObjective : Item, IWinable {
     bool completed = false;
     public IWinable[] objectiveChain;
 
+    void Start()
+    {
+        //objectiveChain = new IWinable[0];
+        ObjectiveIsSpawned();
+    }
+
     public void ObjectiveIsSpawned()
     {
         GameManager.Instance.objectives.Add(this);
@@ -27,7 +33,7 @@ public class ItemObjective : Item, IWinable {
     }
     public bool HasObjectiveChain()
     {
-        if (objectiveChain.Length > 0) return true;
+        //if (objectiveChain.Length > 0) return true;
         return false;
     }
     public override IEnumerator GetStolen(Transform playerTransform) {

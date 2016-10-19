@@ -6,6 +6,10 @@ public class AIObjective : Guard, IWinable {
     bool completed = false;
     public IWinable[] objectiveChain;
     public bool active;
+    void Start()
+    {
+        ObjectiveIsSpawned();
+    }
 
     public void ObjectiveIsSpawned()
     {
@@ -28,7 +32,7 @@ public class AIObjective : Guard, IWinable {
     }
     public bool HasObjectiveChain()
     {
-        if (objectiveChain.Length > 0) return true;
+        //if (objectiveChain.Length > 0) return true;
         return false;
     }
     public override IEnumerator GetBlackJacked()

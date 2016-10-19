@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     public int currentPlayer = 0;
     private int valueStolen;
     public List<IWinable> objectives = new List<IWinable>();
+    public List<IWinable> escapeObjective = new List<IWinable>();
 
     public 
     
@@ -113,6 +114,7 @@ public class GameManager : MonoBehaviour
 
     public bool AllObjectivesComplete()
     {
+        Debug.Log("complete check calling");
         bool allComplete = true;
         foreach(IWinable objective in objectives)
         {
@@ -129,6 +131,7 @@ public class GameManager : MonoBehaviour
         }
         if (allComplete)
         {
+            Debug.Log("YOU WIIIIIIIN");
             //YOU WIIIN
         }
         else

@@ -8,15 +8,21 @@ public class EscapeObjective : MonoBehaviour, IWinable {
     public IWinable[] objectiveChain;
     public Cell[] ObjectivePlace;
     public bool active;
+    void Start()
+    {
+        ObjectiveIsSpawned();
+    }
 
     public void ObjectiveIsSpawned()
     {
         GameManager.Instance.objectives.Add(this);
+        GameManager.Instance.escapeObjective.Add(this);
     }
 
     public void ObjectiveIsCompleted()
     {
-        if (HasObjectiveChain())
+        completed = true;
+        //if (HasObjectiveChain())
         {
             AddObjectiveChain();
         }
@@ -28,15 +34,16 @@ public class EscapeObjective : MonoBehaviour, IWinable {
     }
     public bool HasObjectiveChain()
     {
-        if (objectiveChain.Length > 0) return true;
+        //if (objectiveChain.Length > 0) return true;
         return false;
     }
 
     public void IsPlayerInCells()
     {
+        Debug.Log("Cell checking called");
             foreach (Cell cell in ObjectivePlace)
             {
-                if (cell.isOccupied) {
+                if (cell.isOccupied && cell.occupier != null) {
                     if (cell.occupier == GameManager.Instance.PlayerCharacters[0]) {
                     ObjectiveIsCompleted();
                         if (!GameManager.Instance.AllObjectivesComplete()) completed = false;
