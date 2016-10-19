@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Debug.Log("You Lost FOO!");
-        SceneManager.LoadScene(0);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     // Update is called once per frame
