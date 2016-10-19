@@ -12,12 +12,12 @@ public class PlayerCharacter : Character
     }
     public override void ChangeCurrentCell(Transform destination)
     {
-        foreach(EscapeObjective obj in GameManager.Instance.escapeObjective)
+        base.ChangeCurrentCell(destination);
+        foreach (EscapeObjective obj in GameManager.Instance.escapeObjective)
         {
             obj.IsPlayerInCells();
         }
         Debug.Log("calling new method");
-        base.ChangeCurrentCell(destination);
     }
     public override IEnumerator Move(Transform destination)
     {

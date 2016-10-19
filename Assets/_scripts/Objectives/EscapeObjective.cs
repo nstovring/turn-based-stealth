@@ -22,7 +22,7 @@ public class EscapeObjective : MonoBehaviour, IWinable {
     public void ObjectiveIsCompleted()
     {
         completed = true;
-        //if (HasObjectiveChain())
+        if (HasObjectiveChain())
         {
             AddObjectiveChain();
         }
@@ -40,11 +40,10 @@ public class EscapeObjective : MonoBehaviour, IWinable {
 
     public void IsPlayerInCells()
     {
-        Debug.Log("Cell checking called");
             foreach (Cell cell in ObjectivePlace)
             {
                 if (cell.isOccupied && cell.occupier != null) {
-                    if (cell.occupier == GameManager.Instance.PlayerCharacters[0]) {
+                    if (cell.occupier is PlayerCharacter) {
                     ObjectiveIsCompleted();
                         if (!GameManager.Instance.AllObjectivesComplete()) completed = false;
                     }
