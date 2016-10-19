@@ -31,8 +31,6 @@ public class Guard : Character
         StartActions();
     }
 
- 
-
     public int patrolint = 0;
     IEnumerator IterateThroughPatrolRoutes()
     {
@@ -43,41 +41,69 @@ public class Guard : Character
             currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
             if (Vector3.Distance(transform.position, currentTarget.position) < 1)
             {
-                visualizeViewRange();
                 patrolint++;
+                visualizeViewRange(Color.red);
             }
             yield return StartCoroutine(QueuedMove(currentTarget));
         }
-
-      
     }
 
-    public Transform[] getVisionConeTransforms(int _coneSize)
+    public Transform[] GetVisionConeTransforms(int _coneSize)
     {
         List<Transform> tempViewConeList = new List<Transform>();
-        RaycastHit hit;
-        Vector3 searchDirection = transform.forward;
-        int sideDirection = 0;
 
         for (int i = 0; i < _coneSize; i++)
         {
-            if (Physics.Raycast(currentCell.transform.position + transform.up * 2, searchDirection, LayerMask.GetMask("ViewObstacle")))
-            {
-                Debug.Log("Wall not hit");
-                if (Physics.Raycast(currentCell.transform.position + transform.up * 2 + searchDirection * 2 * i, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
+            Transform temp = GetCellFromDirection(currentCell.transform.position, transform.forward, i);
+            if(temp != null)
+            tempViewConeList.Add(temp);
+
+        }
+        int coneWidth = 1;
+        int tempListLength = tempViewConeList.Count;
+        for (int index = 0; index < tempListLength; index++)
+        {
+            var cell = tempViewConeList[index];
+            //if (coneWidth > 0)
+            //{
+                for (int i = 0; i < coneWidth + 1; i++)
                 {
-                    tempViewConeList.Add(hit.transform);
+                    Transform tempLeft = GetCellFromDirection(cell.transform.position, transform.right*-1, i);
+                    Transform tempRight = GetCellFromDirection(cell.transform.position, transform.right, i);
+                    if(tempRight)
+                        tempViewConeList.Add(tempRight);
+                    if (tempLeft)
+                        tempViewConeList.Add(tempLeft);
                 }
-            }
+            //}
+            coneWidth++;
         }
         return tempViewConeList.ToArray();
     }
 
-    public void visualizeViewRange()
+    Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
     {
-        foreach (var visionConeTransform in getVisionConeTransforms(coneSize))
+        RaycastHit hit;
+        if (!Physics.Raycast(startPosition + transform.up * 1, direction,  distance * 2, LayerMask.GetMask("ViewObstacle")))
         {
-            visionConeTransform.GetComponent<Renderer>().material.color = Color.red;
+            if (Physics.Raycast(startPosition + transform.up * 2 + direction * 2 * distance, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
+            {
+                MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
+                var cell = monohit as Cell;
+                if (cell != null)
+                {
+                    return hit.transform;
+                }
+            }
+        }
+        return null;
+    }
+
+    public void visualizeViewRange(Color color)
+    {
+        foreach (var visionConeTransform in GetVisionConeTransforms(coneSize))
+        {
+            visionConeTransform.GetComponent<Renderer>().material.color = color;
         }
     }
 
