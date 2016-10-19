@@ -1,15 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CameraMovement : MonoBehaviour {
+public class CameraMovement : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
+    public Transform PlayerPosition;
+    public Vector3 CameraDistance;
+
+
+
+    // Use this for initialization
+    void Start () {
 	
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+	{
+
+	    transform.position = PlayerPosition.position + CameraDistance;
+
 	}
 }
