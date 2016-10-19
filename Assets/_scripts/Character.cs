@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Debug = UnityEngine.Debug;
 
 
@@ -14,7 +15,7 @@ public class Character : MonoBehaviour, IClickable
     public Cell currentCell;
     public NavMeshAgent myAgent;
     public int coneSize = 5;
-
+    public List<Transform> visionCone; 
     public enum orientation
     {
         Forward,
@@ -105,7 +106,6 @@ public class Character : MonoBehaviour, IClickable
 
         if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
         {
-            Debug.Log("Got transform");
             return hit.transform;
         }
         return null;
@@ -158,6 +158,8 @@ public class Character : MonoBehaviour, IClickable
 
     public virtual IEnumerator Move(Transform destination)
     {
+        visualizeViewRange(Color.white);
+
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
         Vector3 relativePos = tempDestination - transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
@@ -174,22 +176,82 @@ public class Character : MonoBehaviour, IClickable
             transform.position = Vector3.Lerp(transform.position, tempDestination, 0.2f);
             yield return new WaitForEndOfFrame();
         }
+
         transform.position = tempDestination;
         ChangeCurrentCell(destination);
+        visualizeViewRange(Color.red);
         yield return new WaitForEndOfFrame();
+
     }
     public virtual void ChangeCurrentCell(Transform destination)
     {
         currentCell.isOccupied = false;
         currentCell.occupier = null;
         currentCell = destination.GetComponent<Cell>();
-        currentCell.occupier = transform;
+        currentCell.occupier = this;
         currentCell.isOccupied = true;
-        Debug.Log("reached destination");
         actionPoints--;
     }
 
-  
+
+    public Transform[] GetVisionConeTransforms(int _coneSize)
+    {
+        List<Transform> tempViewConeList = new List<Transform>();
+
+        for (int i = 0; i < _coneSize; i++)
+        {
+            Transform temp = GetCellFromDirection(currentCell.transform.position, transform.forward, i);
+            if (temp != null)
+                tempViewConeList.Add(temp);
+
+        }
+        int coneWidth = 1;
+        int tempListLength = tempViewConeList.Count;
+        for (int index = 0; index < tempListLength; index++)
+        {
+            var cell = tempViewConeList[index];
+            
+            for (int i = 0; i < coneWidth + 1; i++)
+            {
+                Transform tempLeft = GetCellFromDirection(cell.transform.position, transform.right * -1, i);
+                Transform tempRight = GetCellFromDirection(cell.transform.position, transform.right, i);
+                if (tempRight)
+                    tempViewConeList.Add(tempRight);
+                if (tempLeft)
+                    tempViewConeList.Add(tempLeft);
+            }
+            coneWidth++;
+        }
+        return tempViewConeList.ToArray();
+    }
+
+    public Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
+    {
+        RaycastHit hit;
+        if (!Physics.Raycast(startPosition + transform.up * 1, direction, distance * 2, LayerMask.GetMask("ViewObstacle")))
+        {
+            if (Physics.Raycast(startPosition + transform.up * 2 + direction * 2 * distance, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
+            {
+                MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
+                var cell = monohit as Cell;
+                if (cell != null)
+                {
+                    return hit.transform;
+                }
+            }
+        }
+        return null;
+    }
+
+    public virtual void visualizeViewRange(Color color)
+    {
+        visionCone= GetVisionConeTransforms(coneSize).ToList();
+        foreach (var visionConeTransform in visionCone)
+        {
+            visionConeTransform.GetComponent<Renderer>().material.color = color;
+        }
+    }
+
     public void LeftClicked()
     {
         throw new NotImplementedException();

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Cell : MonoBehaviour, IClickable {
     public bool isOccupied;
-    public Transform occupier;
+    public Character occupier;
 	// Use this for initialization
 	void Start () {
 	
