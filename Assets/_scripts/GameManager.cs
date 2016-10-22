@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public List<Character> PlayerCharacters;
-    public List<Character> GuardCharacters;
+    public List<Guard> GuardCharacters;
 
     public bool instantTurnBased;
 
@@ -36,10 +36,10 @@ public class GameManager : MonoBehaviour
         PlayerCharacters.Add(character);
     }
 
-    public void AddGuardCharacters(Character character)
+    public void AddGuardCharacters(Guard character)
     {
         if (GuardCharacters == null)
-            GuardCharacters = new List<Character>();
+            GuardCharacters = new List<Guard>();
         GuardCharacters.Add(character);
     }
 
@@ -57,6 +57,15 @@ public class GameManager : MonoBehaviour
         foreach (var guardCharacter in GuardCharacters)
         {
             guardCharacter.newActions();
+        }
+
+    }
+    public void PlotGuardRoutes()
+    {
+        foreach (var guardCharacter in GuardCharacters)
+        {
+            guardCharacter.virtualCharacter.VisualizeRoute();
+
         }
 
     }
@@ -87,15 +96,17 @@ public class GameManager : MonoBehaviour
     {
         if (AllActionsSpend())
         {
-            playerTurn = !playerTurn;
+            
             if (playerTurn)
             {
                 givePlayerActions();
+                PlotGuardRoutes();
             }
             else
             {
                 giveGuardsActions();
             }
+            playerTurn = !playerTurn;
         }
         
     }

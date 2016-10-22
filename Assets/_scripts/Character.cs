@@ -8,6 +8,7 @@ using Debug = UnityEngine.Debug;
 
 public class Character : MonoBehaviour, IClickable
 {
+    public GameObject virtCharObjPrefab;
     public int totalActionPoints;
     public int actionPoints;
     public Queue<IEnumerator> actions = new Queue<IEnumerator>();

@@ -8,7 +8,7 @@ public class PlayerCharacter : Character
     void Start()
     {
         Initialize();
-        newActions();
+        //newActions();
     }
     public override void ChangeCurrentCell(Transform destination)
     {

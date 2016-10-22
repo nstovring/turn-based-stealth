@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 public class Guard : Character
 {
+    public VirtualGuardCharacter virtualCharacter;
     private Animator myAnimator;
-
     public enum GuardState {Conscious, Unconscious, Stunned, Alert};
     public GuardState MyGuardState = GuardState.Conscious;
     struct Inventory
@@ -21,9 +21,15 @@ public class Guard : Character
 	// Use this for initialization
 	IEnumerator Start ()
 	{
+        if (virtCharObjPrefab != null)
+        {
+            GameObject tempVirtChar = Instantiate(virtCharObjPrefab, transform.position, Quaternion.identity) as GameObject;
+            virtualCharacter = tempVirtChar.GetComponent<VirtualGuardCharacter>();
+            virtualCharacter.super = this;
+        }
         GameManager.Instance.AddGuardCharacters(this);
         GetCurrentCell();
-        newActions();
+        //newActions();
         myAnimator = GetComponentInChildren<Animator>();
         myAnimator.SetBool("Conscious", true);
         AddActionToQueue(IterateThroughPatrolRoutes());
@@ -32,7 +38,7 @@ public class Guard : Character
     }
 
     public int patrolint = 0;
-    IEnumerator IterateThroughPatrolRoutes()
+    public virtual IEnumerator IterateThroughPatrolRoutes()
     {
         currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
 
@@ -50,7 +56,7 @@ public class Guard : Character
    
 
     // Update is called once per frame
-    void Update ()
+    public virtual void Update ()
     {
         CheckForPlayerInView();
     }
