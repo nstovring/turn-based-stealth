@@ -85,16 +85,37 @@ public class Guard : Character
         }
     }
 
+    public override void LeftClicked()
+    {
+        PlayerCharacter player = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
+        if (player.ActionPointsLeft() && Vector3.Distance(player.transform.position, transform.position) < 4)
+        {
+            player.AddActionToQueue(GetBlackJacked());
+        }
+        else
+        {
+            player.AddActionToQueue(player.QueuedMove(transform));
+            player.AddActionToQueue(GetBlackJacked());
+        }
+        player.StartActions();
+    }
+
+    public override void CancelActions()
+    {
+        StopAllCoroutines();
+        base.CancelActions();
+    }
+
     public virtual IEnumerator GetBlackJacked()
     {
-        if (GameManager.Instance.PlayerCharacters[0].ActionPointsLeft())
+        if (GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer].ActionPointsLeft())
         {
             ChangeState(GuardState.Unconscious);
             myAnimator.SetBool("Conscious", false);
             CancelActions();
             yield return new WaitForSeconds(2f);
             Debug.Log("Guard Unconscious");
-            GameManager.Instance.PlayerCharacters[0].actionPoints--;
+            GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer].actionPoints--;
         }
 
     }

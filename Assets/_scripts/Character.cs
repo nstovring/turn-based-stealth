@@ -133,9 +133,10 @@ public class Character : MonoBehaviour, IClickable
         myCoroutine = StartCoroutine(ExecuteActions());
     }
 
-    public void CancelActions()
+    public virtual void CancelActions()
     {
         StopCoroutine(ExecuteActions());
+        //StopAllCoroutines();
         myCoroutine = null;
     }
               
@@ -263,12 +264,12 @@ public class Character : MonoBehaviour, IClickable
         }
     }
 
-    public void LeftClicked()
+    public virtual void LeftClicked()
     {
         throw new NotImplementedException();
     }
 
-    public void RightClicked()
+    public virtual void RightClicked()
     {
         throw new NotImplementedException();
     }

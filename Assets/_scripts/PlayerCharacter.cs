@@ -32,6 +32,7 @@ public class PlayerCharacter : Character
         GetCurrentCell();
     }
 
+
     public override Transform[] GetVisionConeTransforms(int _coneSize)
     {
         IEnumerable<Transform> tempViewConeList = new List<Transform>();

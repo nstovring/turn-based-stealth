@@ -21,7 +21,7 @@ public class GameManager : MonoBehaviour
     public List<IWinable> objectives = new List<IWinable>();
     public List<IWinable> escapeObjective = new List<IWinable>();
 
-    public 
+    public bool PlayerTurn = true;
     
 	void Start ()
 	{

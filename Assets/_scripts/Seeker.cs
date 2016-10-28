@@ -51,7 +51,6 @@ public class Seeker : Character
 
     public Transform MoveSeeker(Transform destination)
     {
-
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
         Vector3 relativePos = tempDestination - transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
