@@ -91,19 +91,28 @@ public class Character : MonoBehaviour, IClickable
         NavMeshPath tempPath = new NavMeshPath();
         myAgent.CalculatePath(targetPosition, tempPath);
         myAgent.path = tempPath;
+        Vector3[] tempArray = new Vector3[tempPath.corners.Length];
+        for (int i = 0; i < tempArray.Length; i++)
+        {
+            tempArray[i] = tempPath.corners[i];
+        }
         myAgent.Stop();
         myAgent.enabled = false;
-        return tempPath.corners;
+        
+        return tempArray;
     }
 
 
     public Transform GetClosestCellTransform(Transform endPosition)
     {
         RaycastHit hit;
-        Vector3 cornerDirection = GetPathfindingVector3s(endPosition.position)[1] - transform.position;
+        Vector3[] cornerArray = GetPathfindingVector3s(endPosition.position);
+        if (cornerArray.Length < 2)
+            return null;
+        Vector3 cornerDirection = cornerArray[1] - transform.position;
         Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection)*currentCell.transform.localScale.z;
-        Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,30f);
-        Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,30f);
+        Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,1f);
+        Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,1f);
 
         if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
         {

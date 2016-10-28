@@ -63,7 +63,6 @@ public class Guard : Character
 
     public override void visualizeViewRange(Color color, bool isWithinView)
     {
-        Debug.Log("Getting Visual Range");
         CheckForPlayerInView();
         base.visualizeViewRange(color, isWithinView);
     }
@@ -75,7 +74,6 @@ public class Guard : Character
 
     public void CheckForPlayerInView()
     {
-        Debug.Log("Checking if player is wthin visual range");
         foreach (var cell in visionCone)
         {
             Cell tempCell = cell.GetComponent<Cell>();

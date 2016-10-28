@@ -20,6 +20,7 @@ public class Cell : MonoBehaviour, IClickable {
     void OnMouseEnter()
     {
         myRenderer.materials[0].SetColor("_Color", Color.blue);
+        GameManager.Instance.PlayerCharacters[0].mySeeker.SetPathToDestination(transform);
     }
 
     void OnMouseExit()
@@ -32,6 +33,7 @@ public class Cell : MonoBehaviour, IClickable {
         {
             myRenderer.materials[0].SetColor("_Color", Color.white);
         }
+        GameManager.Instance.PlayerCharacters[0].mySeeker.ResetPosition();
     }
     public void LeftClicked()
     {

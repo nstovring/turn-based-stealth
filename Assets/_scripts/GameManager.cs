@@ -7,7 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public List<Character> PlayerCharacters;
+    public List<PlayerCharacter> PlayerCharacters;
     public List<Guard> GuardCharacters;
 
     public bool instantTurnBased;
@@ -25,14 +25,14 @@ public class GameManager : MonoBehaviour
     
 	void Start ()
 	{
-        PlayerCharacters = new List<Character>();
+        PlayerCharacters = new List<PlayerCharacter>();
 	    Instance = this;
 	}
 
-    public void AddPlayerCharacters(Character character)
+    public void AddPlayerCharacters(PlayerCharacter character)
     {
         if(PlayerCharacters == null)
-            PlayerCharacters = new List<Character>();
+            PlayerCharacters = new List<PlayerCharacter>();
         PlayerCharacters.Add(character);
     }
 

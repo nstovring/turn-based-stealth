@@ -22,7 +22,7 @@ public class VirtualGuardCharacter : Guard {
     // Update is called once per frame
     public override void Update()
     {
-
+        VisualizeRoute();
     }
     public void GiveActionpoints()
     {
@@ -48,12 +48,18 @@ public class VirtualGuardCharacter : Guard {
     
     public void VisualizeRoute()
     {
-        route = new List<Transform>();
+        //route = new List<Transform>();
         patrolint = super.patrolint;
         transform.position = super.transform.position;
         transform.rotation = super.transform.rotation;
         GiveActionpoints();
         GetCurrentCell();
-        
+
+        //foreach (var cell in route)
+        //{
+        //    cell.GetComponent<Renderer>().material.color = Color.cyan;
+        //    //cell.GetComponent<Cell>().isWithinViewRange = true;
+        //}
+
     }
 }

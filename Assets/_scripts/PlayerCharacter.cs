@@ -5,12 +5,11 @@ using System.Linq;
 
 public class PlayerCharacter : Character
 {
-    public Guard TestGuard;
+    public Seeker mySeeker;
     // Use this for initialization
     void Start()
     {
         Initialize();
-        //newActions();
     }
     public override void ChangeCurrentCell(Transform destination)
     {
@@ -19,7 +18,6 @@ public class PlayerCharacter : Character
         {
             obj.IsPlayerInCells();
         }
-        Debug.Log("calling new method");
     }
     public override IEnumerator Move(Transform destination)
     {
@@ -36,7 +34,6 @@ public class PlayerCharacter : Character
 
     public override Transform[] GetVisionConeTransforms(int _coneSize)
     {
-        _coneSize = actionPoints;
         IEnumerable<Transform> tempViewConeList = new List<Transform>();
 
         Vector3[] viewDirections = {Vector3.forward, Vector3.right, Vector3.forward*-1, Vector3.right * -1};
@@ -58,6 +55,7 @@ public class PlayerCharacter : Character
             for (int j = 0; j < originCellArray[i].Length; j++)
             {
                 Transform cell = originCellArray[i][j];
+                //Minus j because we want the size to decrease the further along the line we progress
                 for (int k = originCellArray[i].Length - j; k > 0; k--)
                 {
                     Transform leftCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[i], k);
@@ -69,10 +67,10 @@ public class PlayerCharacter : Character
             }
 
         }
-        tempViewConeList = tempViewConeList.Concat(originCellArray[0]);
-        tempViewConeList = tempViewConeList.Concat(originCellArray[1]);
-        tempViewConeList = tempViewConeList.Concat(originCellArray[2]);
-        tempViewConeList = tempViewConeList.Concat(originCellArray[3]);
+        for (int i = 0; i < viewDirections.Length; i++)
+        {
+            tempViewConeList = tempViewConeList.Concat(originCellArray[i]);
+        }
         tempViewConeList = tempViewConeList.Concat(sideCellArray);
 
         return tempViewConeList.ToArray();
