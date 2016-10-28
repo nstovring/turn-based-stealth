@@ -159,7 +159,7 @@ public class Character : MonoBehaviour, IClickable
 
     public virtual IEnumerator Move(Transform destination)
     {
-        visualizeViewRange(Color.white);
+        visualizeViewRange(Color.white, false);
 
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
         Vector3 relativePos = tempDestination - transform.position;
@@ -180,7 +180,7 @@ public class Character : MonoBehaviour, IClickable
 
         transform.position = tempDestination;
         ChangeCurrentCell(destination);
-        visualizeViewRange(Color.red);
+        visualizeViewRange(Color.red, true);
         yield return new WaitForEndOfFrame();
 
     }
@@ -195,7 +195,7 @@ public class Character : MonoBehaviour, IClickable
     }
 
 
-    public Transform[] GetVisionConeTransforms(int _coneSize)
+    public virtual Transform[] GetVisionConeTransforms(int _coneSize)
     {
         List<Transform> tempViewConeList = new List<Transform>();
 
@@ -226,7 +226,7 @@ public class Character : MonoBehaviour, IClickable
         return tempViewConeList.ToArray();
     }
 
-    public Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
+    public virtual Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
     {
         RaycastHit hit;
         if (!Physics.Raycast(startPosition + transform.up * 1, direction, distance * 2, LayerMask.GetMask("ViewObstacle")))
@@ -244,11 +244,12 @@ public class Character : MonoBehaviour, IClickable
         return null;
     }
 
-    public virtual void visualizeViewRange(Color color)
+    public virtual void visualizeViewRange(Color color, bool isWithinView)
     {
         visionCone= GetVisionConeTransforms(coneSize).ToList();
         foreach (var visionConeTransform in visionCone)
         {
+            visionConeTransform.GetComponent<Cell>().isWithinViewRange = isWithinView;
             visionConeTransform.GetComponent<Renderer>().material.color = color;
         }
     }

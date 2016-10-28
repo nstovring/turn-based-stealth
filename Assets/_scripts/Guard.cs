@@ -61,11 +61,11 @@ public class Guard : Character
         CheckForPlayerInView();
     }
 
-    public override void visualizeViewRange(Color color)
+    public override void visualizeViewRange(Color color, bool isWithinView)
     {
         Debug.Log("Getting Visual Range");
         CheckForPlayerInView();
-        base.visualizeViewRange(color);
+        base.visualizeViewRange(color, isWithinView);
     }
 
     void ChangeState(GuardState newState)

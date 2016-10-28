@@ -45,10 +45,7 @@ public class VirtualGuardCharacter : Guard {
         yield return base.Move(destination);
     }
 
-    public override void visualizeViewRange(Color color)
-    {
-        
-    }
+    
     public void VisualizeRoute()
     {
         route = new List<Transform>();
