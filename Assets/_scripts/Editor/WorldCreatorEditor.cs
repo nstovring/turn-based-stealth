@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 [CustomEditor(typeof(WorldCreator))]
 public class WorldCreatorEditor : Editor {
-    SerializedProperty worldCreator;
+    //SerializedProperty worldCreator;
     // Use this for initialization
     public override void OnInspectorGUI()
     {
@@ -16,7 +16,7 @@ public class WorldCreatorEditor : Editor {
     }
     void OnEnable()
     {
-        worldCreator = serializedObject.FindProperty("WorldCreator");
+        //worldCreator = serializedObject.FindProperty("WorldCreator");
     }
 	void Start () {
 	

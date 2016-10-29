@@ -8,6 +8,7 @@ using Debug = UnityEngine.Debug;
 
 public class Character : MonoBehaviour, IClickable
 {
+    public Seeker mySeeker;
     public GameObject virtCharObjPrefab;
     public int totalActionPoints;
     public int actionPoints;
@@ -18,7 +19,13 @@ public class Character : MonoBehaviour, IClickable
     public int coneSize = 5;
     public List<Transform> visionCone;
 
+    [Range(0,1)]
+    public int viewType;
+
+
+    public bool isMoving;
     public bool myTurn;
+    public LayerMask solidLayer;
 
 
     public enum orientation
@@ -104,8 +111,9 @@ public class Character : MonoBehaviour, IClickable
         if (cornerArray.Length < 2)
             return null;
         Vector3 cornerDirection = cornerArray[1] - transform.position;
-        Vector3 tempPosVector3 = transform.position + GetDirection(cornerDirection)*currentCell.transform.localScale.z;
-        Debug.DrawRay(tempPosVector3, GetDirection(cornerDirection), Color.red,1f);
+        Vector3 clampedDirection = GetDirection(cornerDirection);
+        Vector3 tempPosVector3 = transform.position + clampedDirection * currentCell.transform.localScale.z;
+        Debug.DrawRay(tempPosVector3, clampedDirection, Color.red,1f);
         Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,1f);
 
         if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
@@ -141,11 +149,13 @@ public class Character : MonoBehaviour, IClickable
             if (actions.Count > 0)
             {
                 visualizeViewRange(false);
+                isMoving = true;
                 yield return StartCoroutine(actions.Dequeue());
             }
             else
             {
                 visualizeViewRange(true);
+                isMoving = false;
                 Debug.Log("All Actions Complete");
                 CancelActions();
                 break;
@@ -238,7 +248,7 @@ public class Character : MonoBehaviour, IClickable
     public virtual Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
     {
         RaycastHit hit;
-        if (!Physics.Raycast(startPosition + transform.up * 1, direction, distance * 2, LayerMask.GetMask("ViewObstacle")))
+        if (!Physics.Raycast(startPosition + transform.up * 1, direction, distance * 2, solidLayer))
         {
             if (Physics.Raycast(startPosition + transform.up * 2 + direction * 2 * distance, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
             {
@@ -258,7 +268,7 @@ public class Character : MonoBehaviour, IClickable
         visionCone= GetVisionConeTransforms(coneSize).ToList();
         foreach (var visionConeTransform in visionCone)
         {
-            visionConeTransform.GetComponent<Cell>().SetActiveViewEdge(isWithinView);
+            visionConeTransform.GetComponent<Cell>().SetActiveViewEdge(viewType, isWithinView);
         }
     }
 

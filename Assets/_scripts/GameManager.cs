@@ -90,6 +90,10 @@ public class GameManager : MonoBehaviour
         {
             CharacterIterator();
         }
+        if (Input.GetKeyUp(KeyCode.Space))
+        {
+            giveGuardsActions();
+        }
     }
 
     public void CharacterIterator()

@@ -11,12 +11,14 @@ public class Seeker : Character
 	{
 	    parentCharacter = transform.parent.GetComponent<Character>();
         actionPoints = parentCharacter.totalActionPoints;
-	    currentCell = CellHelper.GetCurrentCell(transform);
+        totalActionPoints = parentCharacter.totalActionPoints;
+
+        currentCell = CellHelper.GetCurrentCell(transform);
 	}
     public Transform[] GetPathToDestination(Transform endCell)
     {
         List<Transform> tempList = new List<Transform>();
-        actionPoints = parentCharacter.actionPoints *2;
+        actionPoints = parentCharacter.totalActionPoints *2;
         if (Vector3.Distance(parentCharacter.transform.position, endCell.position) > 2)
         {
             for (int i = 0; i < actionPoints; i++)
@@ -33,15 +35,19 @@ public class Seeker : Character
 
     public void SetPathToDestination(Transform endTransform)
     {
-        path = GetPathToDestination(endTransform);
-        foreach (var cell in path)
+        if (!parentCharacter.isMoving)
         {
-            cell.GetComponent<Renderer>().material.color = Color.cyan;
+            path = GetPathToDestination(endTransform);
+            foreach (var cell in path)
+            {
+                cell.GetComponent<Renderer>().material.color = Color.cyan;
+            }
         }
     }
 
     public void ResetPosition()
     {
+        actionPoints = parentCharacter.totalActionPoints;
         transform.position = transform.parent.position;
         foreach (var cell in path)
         {
@@ -60,8 +66,8 @@ public class Seeker : Character
         tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
 
         transform.position = tempDestination;
-        ChangeCurrentCell(destination);
-
+        currentCell = destination.GetComponent<Cell>();
+        actionPoints--;
         return currentCell.transform;
     }
     // Update is called once per frame

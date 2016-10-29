@@ -16,11 +16,11 @@ public class VirtualGuardCharacter : Guard {
 	void Start () {
         patrolTransforms = super.patrolTransforms;
         actionPoints = super.actionPoints;
-        StartCoroutine(IterateThroughPatrolRoutes());
+        //StartCoroutine(IterateThroughPatrolRoutes());
     }
 
     // Update is called once per frame
-    public override void Update()
+    void Update()
     {
         VisualizeRoute();
     }

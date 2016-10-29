@@ -43,12 +43,11 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private Cell currentCell;
     private IEnumerator ReadMousePositionInWorld()
     {
         while (true)
         {
-            yield return new WaitForFixedUpdate();
+            yield return new WaitForSeconds(0.1f);
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
             if (Physics.Raycast(ray, out hit, 100, LayerMask.GetMask("Ground")))
@@ -58,9 +57,11 @@ public class InputManager : MonoBehaviour
                 if (cell)
                 {
                     GameManager.Instance.PlayerCharacters[0].mySeeker.ResetPosition();
-                    currentCell = cell;
                     if (GameManager.Instance.PlayerTurn)
-                        GameManager.Instance.PlayerCharacters[0].mySeeker.SetPathToDestination(cell.transform);
+                        GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer].mySeeker.SetPathToDestination(cell.transform);
+
+                  
+
                     mousePositionInWorld = cell.transform.position + new Vector3(0, 1, 0);
                 }
             }

@@ -9,13 +9,14 @@ public class Door : MonoBehaviour, IClickable
     private bool opened = false;
     private Animator myAnimator;
     private Queue<IEnumerator> queue = new Queue<IEnumerator>();
-    public Cell myCell;
+    public Cell[] myCells;
     // Use this for initialization
     void Start()
     {
         myAnimator = transform.parent.GetComponent<Animator>();
         opened = false;
         myAnimator.SetBool("opened", opened);
+        myCells = CellHelper.GetFrontBackCells(transform);
         if (Lock.locked)
         {
             queue.Enqueue(Lock.PickLock());
@@ -65,18 +66,28 @@ public class Door : MonoBehaviour, IClickable
     {
         Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
         //If player next to door open/picklock door
-        if (character.currentCell == myCell)
+        if (character.currentCell == myCells[0] || character.currentCell == myCells[1])
         {
             character.AddActionToQueue(Action());
-            return;
+            //return;
         }
         else
         {
             //else queue movement to nearest grid
-            character.AddActionToQueue(character.QueuedMove(myCell.transform));
+            character.AddActionToQueue(character.QueuedMove(closestCellBetweenMeAndChar(character).transform));
             character.AddActionToQueue(Action());
         }
         character.StartActions();
+    }
+
+    Cell closestCellBetweenMeAndChar(Character character)
+    {
+        if (Vector3.Distance(myCells[0].transform.position, character.transform.position) >
+            Vector3.Distance(myCells[1].transform.position, character.transform.position))
+        {
+            return myCells[1];
+        }
+        return myCells[0];
     }
 
     public void RightClicked()

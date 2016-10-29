@@ -5,7 +5,6 @@ using System.Linq;
 
 public class PlayerCharacter : Character
 {
-    public Seeker mySeeker;
     // Use this for initialization
     void Start()
     {
@@ -28,8 +27,9 @@ public class PlayerCharacter : Character
 
     public override void Initialize()
     {
-        GameManager.Instance.AddPlayerCharacters(this);
         base.Initialize();
+        GameManager.Instance.AddPlayerCharacters(this);
+        visualizeViewRange(false);
     }
 
 
@@ -47,7 +47,6 @@ public class PlayerCharacter : Character
             Transform[] transforms = GetCellArrayFromDirection(currentCell.transform.position, viewDirections[i],
                 actionPoints);
             originCellArray[i] = transforms;
-            
         }
         List<Transform> sideCellArray = new List<Transform>();
 
@@ -63,6 +62,11 @@ public class PlayerCharacter : Character
                     if (leftCell && !sideCellArray.Contains(leftCell))
                     {
                         sideCellArray.Add(leftCell);
+                    }
+                    Transform rightCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[(i+2)%4], k);
+                    if (rightCell && !sideCellArray.Contains(rightCell))
+                    {
+                        sideCellArray.Add(rightCell);
                     }
                 }
             }
