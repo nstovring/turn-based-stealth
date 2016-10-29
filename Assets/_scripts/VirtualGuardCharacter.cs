@@ -53,7 +53,7 @@ public class VirtualGuardCharacter : Guard {
         transform.position = super.transform.position;
         transform.rotation = super.transform.rotation;
         GiveActionpoints();
-        GetCurrentCell();
+        currentCell = CellHelper.GetCurrentCell(transform);
 
         //foreach (var cell in route)
         //{

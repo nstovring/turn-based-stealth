@@ -16,7 +16,11 @@ public class Character : MonoBehaviour, IClickable
     public Cell currentCell;
     public NavMeshAgent myAgent;
     public int coneSize = 5;
-    public List<Transform> visionCone; 
+    public List<Transform> visionCone;
+
+    public bool myTurn;
+
+
     public enum orientation
     {
         Forward,
@@ -69,20 +73,10 @@ public class Character : MonoBehaviour, IClickable
         return Vector3.zero;
     }
 
-    public void GetCurrentCell()
+    public virtual void Initialize()
     {
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position + transform.up * 1, transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
-        {
-            MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
-            var cell = monohit as Cell;
-            if (cell != null)
-            {
-                currentCell = cell;
-            }
-        }
+        currentCell = CellHelper.GetCurrentCell(transform);
     }
-
 
     public Vector3[] GetPathfindingVector3s(Vector3 targetPosition)
     {
@@ -125,7 +119,6 @@ public class Character : MonoBehaviour, IClickable
     public void AddActionToQueue(IEnumerator action)
     {
         actions.Enqueue(action);
-
     }
 
     public void StartActions()
@@ -139,37 +132,43 @@ public class Character : MonoBehaviour, IClickable
         //StopAllCoroutines();
         myCoroutine = null;
     }
-              
-    IEnumerator ExecuteActions()
+
+    public bool allCurrentActionsComplete;
+    public virtual IEnumerator ExecuteActions()
     {
         while (true)
         {
             if (actions.Count > 0)
             {
+                visualizeViewRange(false);
                 yield return StartCoroutine(actions.Dequeue());
             }
             else
             {
+                visualizeViewRange(true);
                 Debug.Log("All Actions Complete");
                 CancelActions();
                 break;
-                //yield return null;
             }
         }
     }
 
+    public bool destinationReached;
     public virtual IEnumerator QueuedMove(Transform finalDestination)
     {
+        visualizeViewRange(false);
         Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
         while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f && ActionPointsLeft())
         {
-                yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
+            yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
         }
+        destinationReached = currentCell.transform == finalDestination;
+        visualizeViewRange(true);
     }
 
     public virtual IEnumerator Move(Transform destination)
     {
-        visualizeViewRange(Color.white, false);
+        //visualizeViewRange(false);
 
         Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
         Vector3 relativePos = tempDestination - transform.position;
@@ -190,7 +189,7 @@ public class Character : MonoBehaviour, IClickable
 
         transform.position = tempDestination;
         ChangeCurrentCell(destination);
-        visualizeViewRange(Color.red, true);
+        //visualizeViewRange(true);
         yield return new WaitForEndOfFrame();
 
     }
@@ -254,13 +253,12 @@ public class Character : MonoBehaviour, IClickable
         return null;
     }
 
-    public virtual void visualizeViewRange(Color color, bool isWithinView)
+    public virtual void visualizeViewRange(bool isWithinView)
     {
         visionCone= GetVisionConeTransforms(coneSize).ToList();
         foreach (var visionConeTransform in visionCone)
         {
-            visionConeTransform.GetComponent<Cell>().isWithinViewRange = isWithinView;
-            visionConeTransform.GetComponent<Renderer>().material.color = color;
+            visionConeTransform.GetComponent<Cell>().SetActiveViewEdge(isWithinView);
         }
     }
 
@@ -273,7 +271,7 @@ public class Character : MonoBehaviour, IClickable
     {
         throw new NotImplementedException();
     }
-    public void newActions()
+    public virtual void newActions()
     {
         //actions = new Queue<IEnumerator>();
         actionPoints = totalActionPoints;

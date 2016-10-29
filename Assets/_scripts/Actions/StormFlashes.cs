@@ -28,9 +28,23 @@ public class StormFlashes : MonoBehaviour
                 DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 8, 0.8f);
                 yield return new WaitForEndOfFrame();
             }
+
             while (DirectionalLight.intensity > 0)
             {
-                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.01f);
+                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 1f);
+                if (DirectionalLight.intensity < 0.01f)
+                    DirectionalLight.intensity = 0;
+                yield return new WaitForEndOfFrame();
+            }
+
+            while (DirectionalLight.intensity < 3)
+            {
+                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 8, 0.8f);
+                yield return new WaitForEndOfFrame();
+            }
+            while (DirectionalLight.intensity > 0)
+            {
+                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.05f);
                 if (DirectionalLight.intensity < 0.01f)
                     DirectionalLight.intensity = 0;
                 yield return new WaitForEndOfFrame();

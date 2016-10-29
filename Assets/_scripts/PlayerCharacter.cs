@@ -26,10 +26,10 @@ public class PlayerCharacter : Character
         return base.Move(destination);
     }
 
-    void Initialize()
+    public override void Initialize()
     {
         GameManager.Instance.AddPlayerCharacters(this);
-        GetCurrentCell();
+        base.Initialize();
     }
 
 
@@ -57,7 +57,7 @@ public class PlayerCharacter : Character
             {
                 Transform cell = originCellArray[i][j];
                 //Minus j because we want the size to decrease the further along the line we progress
-                for (int k = originCellArray[i].Length - j; k > 0; k--)
+                for (int k = actionPoints - j; k > 0; k--)
                 {
                     Transform leftCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[i], k);
                     if (leftCell && !sideCellArray.Contains(leftCell))

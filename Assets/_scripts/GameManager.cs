@@ -60,15 +60,15 @@ public class GameManager : MonoBehaviour
         }
 
     }
-    public void PlotGuardRoutes()
-    {
-        foreach (var guardCharacter in GuardCharacters)
-        {
-            guardCharacter.virtualCharacter.VisualizeRoute();
+    //public void PlotGuardRoutes()
+    //{
+    //    foreach (var guardCharacter in GuardCharacters)
+    //    {
+    //        guardCharacter.virtualCharacter.VisualizeRoute();
 
-        }
+    //    }
 
-    }
+    //}
 
     public void givePlayerActions()
     {
@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
             if (playerTurn)
             {
                 givePlayerActions();
-                PlotGuardRoutes();
+                //PlotGuardRoutes();
             }
             else
             {

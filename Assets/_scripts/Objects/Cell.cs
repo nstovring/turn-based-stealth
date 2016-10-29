@@ -6,34 +6,37 @@ public class Cell : MonoBehaviour, IClickable {
     public bool isWithinViewRange;
     public Character occupier;
     private Renderer myRenderer;
+    public Transform viewCellEdge;
 	// Use this for initialization
 	void Start ()
 	{
+	    viewCellEdge = Instantiate(viewCellEdge, transform.position + new Vector3(0,1,0), Quaternion.identity) as Transform;
+
+	    viewCellEdge.parent = transform;
+        viewCellEdge.gameObject.SetActive(false);
 	    myRenderer = GetComponent<Renderer>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
+    public void SetActiveViewEdge(bool active)
+    {
+        viewCellEdge.gameObject.SetActive(active);
+    }
+
+	// Update is called once per frame
+	
     void OnMouseEnter()
     {
-        myRenderer.materials[0].SetColor("_Color", Color.blue);
-        GameManager.Instance.PlayerCharacters[0].mySeeker.SetPathToDestination(transform);
+        //if(GameManager.Instance.PlayerTurn)
+        //    GameManager.Instance.PlayerCharacters[0].mySeeker.SetPathToDestination(transform);
     }
 
     void OnMouseExit()
     {
-        if (isWithinViewRange)
-        {
-            myRenderer.materials[0].SetColor("_Color", Color.red);
-        }
-        else
-        {
-            myRenderer.materials[0].SetColor("_Color", Color.white);
-        }
-        GameManager.Instance.PlayerCharacters[0].mySeeker.ResetPosition();
+        
+        //myRenderer.materials[0].SetColor("_Color", Color.white);
+
+        //if (GameManager.Instance.PlayerTurn)
+        //    GameManager.Instance.PlayerCharacters[0].mySeeker.ResetPosition();
     }
     public void LeftClicked()
     {

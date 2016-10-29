@@ -11,13 +11,13 @@ public class Seeker : Character
 	{
 	    parentCharacter = transform.parent.GetComponent<Character>();
         actionPoints = parentCharacter.totalActionPoints;
-        GetCurrentCell();
+	    currentCell = CellHelper.GetCurrentCell(transform);
 	}
     public Transform[] GetPathToDestination(Transform endCell)
     {
         List<Transform> tempList = new List<Transform>();
         actionPoints = parentCharacter.actionPoints *2;
-        if (Vector3.Distance(parentCharacter.transform.position, endCell.position) > 4)
+        if (Vector3.Distance(parentCharacter.transform.position, endCell.position) > 2)
         {
             for (int i = 0; i < actionPoints; i++)
             {

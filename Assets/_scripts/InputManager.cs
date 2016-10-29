@@ -5,10 +5,15 @@ public class InputManager : MonoBehaviour
 {
     public static Vector3 mousePositionInWorld;
     public static Rect mousePositionOnScreen;
+    public Transform Selector;
+
+    public LayerMask ClickableLayer;
 	// Use this for initialization
 	void Start ()
 	{
-	    StartCoroutine(readMousePositionInWorld());
+	    Selector = Instantiate(Selector, Vector3.zero,Quaternion.identity) as Transform;
+	    Selector.parent = transform;
+	    StartCoroutine(ReadMousePositionInWorld());
 	}
 	
 	// Update is called once per frame
@@ -27,7 +32,7 @@ public class InputManager : MonoBehaviour
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 100))
+        if (Physics.Raycast(ray, out hit, 100, ClickableLayer))
         {
             MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
             var clickable = monohit as IClickable;
@@ -38,13 +43,28 @@ public class InputManager : MonoBehaviour
         }
     }
 
-    private IEnumerator readMousePositionInWorld()
+    private Cell currentCell;
+    private IEnumerator ReadMousePositionInWorld()
     {
         while (true)
         {
             yield return new WaitForFixedUpdate();
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            mousePositionInWorld = ray.GetPoint(100);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 100, LayerMask.GetMask("Ground")))
+            {
+                MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
+                var cell = monohit as Cell;
+                if (cell)
+                {
+                    GameManager.Instance.PlayerCharacters[0].mySeeker.ResetPosition();
+                    currentCell = cell;
+                    if (GameManager.Instance.PlayerTurn)
+                        GameManager.Instance.PlayerCharacters[0].mySeeker.SetPathToDestination(cell.transform);
+                    mousePositionInWorld = cell.transform.position + new Vector3(0, 1, 0);
+                }
+            }
+            Selector.transform.position = mousePositionInWorld;
         }
     }
 }
