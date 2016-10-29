@@ -21,50 +21,101 @@ public class Guard : Character
 	// Use this for initialization
 	IEnumerator Start ()
 	{
-        if (virtCharObjPrefab != null)
-        {
-            GameObject tempVirtChar = Instantiate(virtCharObjPrefab, transform.position, Quaternion.identity) as GameObject;
-            virtualCharacter = tempVirtChar.GetComponent<VirtualGuardCharacter>();
-            virtualCharacter.super = this;
-        }
+        //if (virtCharObjPrefab != null)
+        //{
+        //    GameObject tempVirtChar = Instantiate(virtCharObjPrefab, transform.position, Quaternion.identity) as GameObject;
+        //    virtualCharacter = tempVirtChar.GetComponent<VirtualGuardCharacter>();
+        //    virtualCharacter.super = this;
+        //}
         GameManager.Instance.AddGuardCharacters(this);
-        GetCurrentCell();
-        //newActions();
+	    currentCell = CellHelper.GetCurrentCell(transform);
+
+	    for (int index = 0; index < patrolTransforms.Length; index++)
+	    {
+	        var patrolTransform = patrolTransforms[index];
+            patrolTransforms[index] = CellHelper.GetCurrentCell(patrolTransform).transform;
+	    }
+
         myAnimator = GetComponentInChildren<Animator>();
         myAnimator.SetBool("Conscious", true);
-        AddActionToQueue(IterateThroughPatrolRoutes());
-	    yield return new WaitForSeconds(0.1f);
+        visualizeViewRange(false);
+
+        currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
+
+        AddActionToQueue(QueuedMove(currentTarget));
+
+        yield return new WaitForSeconds(0.1f);
+
         StartActions();
     }
 
     public int patrolint = 0;
-    public virtual IEnumerator IterateThroughPatrolRoutes()
-    {
-        currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
 
-        while (Vector3.Distance(transform.position, currentTarget.position) > 0.1)
+
+    public void EvaluateNextGoal()
+    {
+        if (destinationReached)
         {
-            currentTarget = patrolTransforms[patrolint % patrolTransforms.Length];
-            if (Vector3.Distance(transform.position, currentTarget.position) < 1)
-            {
-                patrolint++;
-            }
-            yield return StartCoroutine(QueuedMove(currentTarget));
+            patrolint++;
+            currentTarget = patrolTransforms[patrolint%patrolTransforms.Length];
+            destinationReached = false;
+            AddActionToQueue(QueuedMove(currentTarget));
+        }
+        else
+        {
+            AddActionToQueue(QueuedMove(currentTarget));
         }
     }
 
-   
-
-    // Update is called once per frame
-    public virtual void Update ()
+    public override IEnumerator ExecuteActions()
     {
-        CheckForPlayerInView();
+        while (true)
+        {
+            if (actions.Count > 0)
+            {
+                mySeeker.ResetPosition();
+                isMoving = true;
+                visualizeViewRange(false);
+                yield return StartCoroutine(actions.Dequeue());
+            }
+            else
+            {
+                visualizeViewRange(true);
+                isMoving = false;
+                if (destinationReached)
+                {
+                    EvaluateNextGoal();
+                    StartActions();
+                }
+                else
+                {
+                    mySeeker.SetPathToDestination(currentTarget);
+                    CancelActions();
+                }
+                break;
+            }
+        }
     }
 
-    public override void visualizeViewRange(Color color, bool isWithinView)
+    public override void newActions()
+    {
+        base.newActions();
+        EvaluateNextGoal();
+        StartActions();
+    }
+
+
+    // Update is called once per frame
+    void Update ()
     {
         CheckForPlayerInView();
-        base.visualizeViewRange(color, isWithinView);
+        mySeeker.transform.position += new Vector3(0, 0, Input.GetAxis("Horizontal"));
+    }
+
+    public override void visualizeViewRange(bool isWithinView)
+    {
+        base.visualizeViewRange(isWithinView);
+        CheckForPlayerInView();
     }
 
     void ChangeState(GuardState newState)
