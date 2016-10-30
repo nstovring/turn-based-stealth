@@ -18,7 +18,14 @@ public class Seeker : Character
     public Transform[] GetPathToDestination(Transform endCell)
     {
         List<Transform> tempList = new List<Transform>();
-        actionPoints = parentCharacter.totalActionPoints *2;
+        if (parentCharacter.actionPoints <= 0)
+        {
+            actionPoints = parentCharacter.totalActionPoints*2;
+        }
+        else
+        {
+            actionPoints = parentCharacter.actionPoints* 2;
+        }
         if (Vector3.Distance(parentCharacter.transform.position, endCell.position) > 2)
         {
             for (int i = 0; i < actionPoints; i++)
@@ -40,7 +47,7 @@ public class Seeker : Character
             path = GetPathToDestination(endTransform);
             foreach (var cell in path)
             {
-                cell.GetComponent<Renderer>().material.color = Color.cyan;
+                cell.GetComponent<Cell>().SetActiveViewEdge((parentCharacter.viewType+2)%4, true);
             }
         }
     }
@@ -51,7 +58,7 @@ public class Seeker : Character
         transform.position = transform.parent.position;
         foreach (var cell in path)
         {
-            cell.GetComponent<Renderer>().material.color = Color.white;
+            cell.GetComponent<Cell>().SetActiveViewEdge((parentCharacter.viewType + 2) % 4, false);
         }
     }
 

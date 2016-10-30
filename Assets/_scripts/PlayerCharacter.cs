@@ -56,7 +56,7 @@ public class PlayerCharacter : Character
             {
                 Transform cell = originCellArray[i][j];
                 //Minus j because we want the size to decrease the further along the line we progress
-                for (int k = actionPoints - j; k > 0; k--)
+                for (int k = actionPoints - j+1; k > 0; k--)
                 {
                     Transform leftCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[i], k);
                     if (leftCell && !sideCellArray.Contains(leftCell))

@@ -7,6 +7,7 @@
 		_RimModifier("Rim Modifier", Range(0,1)) = 0.5
 		_DotProduct("Rim effect", Range(-1,1)) = 0.25
 		_HeightSlider("Height falloff", Range(0,2)) = 1
+		_HeightOffset("Height Offset", Range(-2,2)) = 0
 	}
 	SubShader {
 		Tags { "Queue" = "Transparent" "RenderType"="Transparent" "IgnoreProjector" = "true" }
@@ -31,6 +32,7 @@
 		float _DotProduct;
 		float _RimModifier;
 		float _HeightSlider;
+		float _HeightOffset;
 		float4 _AmbientColor;
 		half _MySliderValue;
 		fixed4 _Color;
@@ -38,10 +40,8 @@
 
 		void surf (Input IN, inout SurfaceOutput o) {
 			// Albedo comes from a texture tinted by color
-			float heightScale = IN.worldPos.y / _HeightSlider;
-			//if(heightScale > 0.5){
+			float heightScale = (IN.worldPos.y -_HeightOffset) / _HeightSlider;
 			
-			//}
 			fixed4 c = tex2D(_MainTex,IN.uv_MainTex) * pow((_Color+_AmbientColor),_MySliderValue);
 			o.Albedo = c.rgb;
 

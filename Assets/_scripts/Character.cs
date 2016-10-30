@@ -156,7 +156,7 @@ public class Character : MonoBehaviour, IClickable
             {
                 visualizeViewRange(true);
                 isMoving = false;
-                Debug.Log("All Actions Complete");
+                //Debug.Log("All Actions Complete");
                 CancelActions();
                 break;
             }
