@@ -10,6 +10,9 @@ public class Guard : Character
     private Animator myAnimator;
     public enum GuardState {Conscious, Unconscious, Stunned, Alert};
     public GuardState MyGuardState = GuardState.Conscious;
+    public int maxUnconsciousTime;
+    int unconsciousTime;
+    public bool turnDone;
     struct Inventory
     {
         int coin;
@@ -23,6 +26,10 @@ public class Guard : Character
 	IEnumerator Start ()
 	{
         Initialize();
+        if(maxUnconsciousTime == 0)
+        {
+            maxUnconsciousTime = 3;
+        }
         //if (virtCharObjPrefab != null)
         //{
         //    GameObject tempVirtChar = Instantiate(virtCharObjPrefab, transform.position, Quaternion.identity) as GameObject;
@@ -55,32 +62,47 @@ public class Guard : Character
   
     public override IEnumerator ExecuteActions()
     {
-        while (true)
+        turnDone = false;
+        if (MyGuardState == GuardState.Conscious || MyGuardState == GuardState.Alert || unconsciousTime == maxUnconsciousTime)
         {
-            if (actions.Count > 0)
+            unconsciousTime = 0;
+            while (true)
             {
-                mySeeker.ResetPosition();
-                isMoving = true;
-                visualizeViewRange(false);
-                //Debug.Log("stuff");
-                yield return StartCoroutine(actions.Dequeue());
-            }
-            else
-            {
-                visualizeViewRange(true);
-                isMoving = false;
-                if (destinationReached)
+                if (actions.Count > 0)
                 {
-                    EvaluateNextGoal();
-                    StartActions();
+                    mySeeker.ResetPosition();
+                    isMoving = true;
+                    visualizeViewRange(false);
+                    //Debug.Log("stuff");
+                    yield return StartCoroutine(actions.Dequeue());
                 }
                 else
                 {
-                    mySeeker.SetPathToDestination(currentTarget);
-                    CancelActions();
+                    visualizeViewRange(true);
+                    isMoving = false;
+                    if (destinationReached)
+                    {
+                        EvaluateNextGoal();
+                        StartActions();
+                    }
+                    else
+                    {
+                        mySeeker.SetPathToDestination(currentTarget);
+                        //Debug.Log("helloo2");
+                        turnDone = true;
+                        CancelActions();
+                    }
+                    
+                    break;
                 }
-                break;
             }
+            
+        }
+        else
+        {
+            EndTurn();
+            turnDone = true;
+            unconsciousTime++;
         }
     }
     public void EvaluateNextGoal()
@@ -198,5 +220,9 @@ public class Guard : Character
     IEnumerator GetPickPocketed()
     {
         return null;
+    }
+    public bool GetTurnDone()
+    {
+        return turnDone;
     }
 }

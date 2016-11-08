@@ -54,10 +54,11 @@ public class GameManager : MonoBehaviour
 
     public void giveGuardsActions()
     {
-        foreach (var guardCharacter in GuardCharacters)
-        {
-            guardCharacter.newActions();
-        }
+        //foreach (var guardCharacter in GuardCharacters)
+        //{
+        //    guardCharacter.newActions();
+        //}
+        StartCoroutine(aiManager.GiveGuardsTurns());
 
     }
     //public void PlotGuardRoutes()
@@ -92,7 +93,7 @@ public class GameManager : MonoBehaviour
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            giveGuardsActions();
+            PlayerCharacters[0].EndTurn();
         }
     }
 
