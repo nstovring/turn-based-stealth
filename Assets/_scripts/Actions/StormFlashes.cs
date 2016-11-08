@@ -6,11 +6,8 @@ public class StormFlashes : MonoBehaviour
     public bool StartStorm = true;
     public Light DirectionalLight;
 
-
-
     public float longDelay = 5;
     public float shortDelay = 0.5f;
-
 
     // Use this for initialization
     void Start ()
@@ -44,8 +41,8 @@ public class StormFlashes : MonoBehaviour
             }
             while (DirectionalLight.intensity > 0)
             {
-                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.05f);
-                if (DirectionalLight.intensity < 0.01f)
+                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.1f);
+                if (DirectionalLight.intensity < 0.1f)
                     DirectionalLight.intensity = 0;
                 yield return new WaitForEndOfFrame();
             }

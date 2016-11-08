@@ -10,13 +10,14 @@ public class Item : MonoBehaviour, IClickable, IStealable
 
     void Start()
     {
+        currentCell = CellHelper.GetCurrentCell(transform);
         GetCurrentCell();
     }
 
     private void GetCurrentCell()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.up*-1, out hit,LayerMask.NameToLayer("Ground")))
+        if (Physics.Raycast(transform.position, transform.up*-1, out hit,LayerMask.GetMask("Ground")))
         {
             MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
             var cell = monohit as Cell;
@@ -31,13 +32,13 @@ public class Item : MonoBehaviour, IClickable, IStealable
     {
         Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
         //If player next to object getstolen
-        if (character.currentCell == currentCell)
+        if (Vector3.Distance(character.currentCell.myTransform.position, transform.position) < 2)
         {
             character.AddActionToQueue(GetStolen(character.transform));
         }
         else //else queue movement to nearest grid
         {
-            character.AddActionToQueue(character.QueuedMove(transform));
+            character.AddActionToQueue(character.QueuedMove(currentCell.myTransform));
             character.AddActionToQueue(GetStolen(character.transform));
         }
         character.StartActions();
