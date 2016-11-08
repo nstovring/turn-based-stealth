@@ -33,37 +33,37 @@ public class PlayerCharacter : Character
     }
 
 
-    public override Transform[] GetVisionConeTransforms(int _coneSize)
+    public override Cell[] GetVisionConeTransforms(int _coneSize)
     {
-        IEnumerable<Transform> tempViewConeList = new List<Transform>();
+        IEnumerable<Cell> tempViewConeList = new List<Cell>();
 
         Vector3[] viewDirections = {Vector3.forward, Vector3.right, Vector3.forward*-1, Vector3.right * -1};
         Vector3[] orthogonalDirections = { Vector3.right, Vector3.forward * -1, Vector3.right * -1, Vector3.forward};
 
-        Transform[][] originCellArray = new Transform[4][];
+        Cell[][] originCellArray = new Cell[4][];
 
         for (int i = 0; i < viewDirections.Length; i++)
         {
-            Transform[] transforms = GetCellArrayFromDirection(currentCell.transform.position, viewDirections[i],
+            Cell[] transforms = GetCellArrayFromDirection(currentCell.transform.position, viewDirections[i],
                 actionPoints);
             originCellArray[i] = transforms;
         }
-        List<Transform> sideCellArray = new List<Transform>();
+        List<Cell> sideCellArray = new List<Cell>();
 
         for (int i = 0; i < originCellArray.Length; i++)
         {
             for (int j = 0; j < originCellArray[i].Length; j++)
             {
-                Transform cell = originCellArray[i][j];
+                Cell cell = originCellArray[i][j];
                 //Minus j because we want the size to decrease the further along the line we progress
-                for (int k = actionPoints - j+1; k > 0; k--)
+                for (int k = actionPoints - j; k > 0; k--)
                 {
-                    Transform leftCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[i], k);
+                    Cell leftCell = CellHelper.GetCellFromDirection(cell.transform.position, orthogonalDirections[i], k,solidLayer);
                     if (leftCell && !sideCellArray.Contains(leftCell))
                     {
                         sideCellArray.Add(leftCell);
                     }
-                    Transform rightCell = GetCellFromDirection(cell.transform.position, orthogonalDirections[(i+2)%4], k);
+                    Cell rightCell = CellHelper.GetCellFromDirection(cell.transform.position, orthogonalDirections[(i+2)%4], k, solidLayer);
                     if (rightCell && !sideCellArray.Contains(rightCell))
                     {
                         sideCellArray.Add(rightCell);
@@ -81,14 +81,15 @@ public class PlayerCharacter : Character
         return tempViewConeList.ToArray();
     }
 
-    Transform[] GetCellArrayFromDirection(Vector3 startPosition, Vector3 direction, int distance)
+    Cell[] GetCellArrayFromDirection(Vector3 startPosition, Vector3 direction, int distance)
     {
-        List<Transform> tempList = new List<Transform>();
+        List<Cell> tempList = new List<Cell>();
         for (int i = 0; i < distance; i++)
         {
-            Transform cell = GetCellFromDirection(startPosition, direction, i);
+            Cell cell = CellHelper.GetCellFromDirection(startPosition, direction, i,solidLayer);
             if (cell)
-            tempList.Add(GetCellFromDirection(startPosition, direction, i));
+            tempList.Add(cell);
+            //tempList.Add(CellHelper.GetCellFromDirection(startPosition, direction, i,solidLayer));
         }
         return tempList.ToArray();
     }

@@ -6,17 +6,23 @@ public class Door : MonoBehaviour, IClickable
 {
     public Lock Lock;
     [SerializeField]
-    private bool opened = false;
+    public bool opened = false;
     private Animator myAnimator;
     private Queue<IEnumerator> queue = new Queue<IEnumerator>();
     public Cell[] myCells;
+    private NavMeshObstacle myObstacle;
     // Use this for initialization
     void Start()
     {
+        myObstacle = GetComponent<NavMeshObstacle>();
         myAnimator = transform.parent.GetComponent<Animator>();
         opened = false;
         myAnimator.SetBool("opened", opened);
         myCells = CellHelper.GetFrontBackCells(transform);
+        foreach (var myCell in myCells)
+        {
+            myCell.door = this;
+        }
         if (Lock.locked)
         {
             queue.Enqueue(Lock.PickLock());
@@ -27,9 +33,10 @@ public class Door : MonoBehaviour, IClickable
     IEnumerator Open()
     {
         myAnimator.SetBool("opened", true);
-        opened = false;
+        opened = true;
        
         yield return new WaitForSeconds(1f);
+        myObstacle.carving = true;
         //Debug.Log("Door Opened");
         opened = true;
     }
@@ -37,9 +44,10 @@ public class Door : MonoBehaviour, IClickable
     IEnumerator Close()
     {
         myAnimator.SetBool("opened", false);
-        opened = true;
+        opened = false;
 
         yield return new WaitForSeconds(1f);
+        myObstacle.carving = false;
         //Debug.Log("Door Closed");
         opened = false;
     }

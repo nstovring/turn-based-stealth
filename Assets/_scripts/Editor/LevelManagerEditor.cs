@@ -1,15 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
+//using UnityEditor;
 
-public class LevelManagerEditor : MonoBehaviour {
+//[CustomEditor(typeof(LevelManager))]
+public class LevelManagerEditor : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    //public override void OnInspectorGUI()
+    //{
+    //    DrawDefaultInspector();
+    //    LevelManager myLevelManager = (LevelManager)target;
+    //    if (GUILayout.Button("Get Walls"))
+    //    {
+    //        myLevelManager.GetWalls();
+    //    }
+    //}
+   
 }

@@ -1,22 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 public class Item : MonoBehaviour, IClickable, IStealable
 {
     public int value;
 
     public Cell currentCell;
-
+    public Cell[] currentCells;
 
     void Start()
     {
+       // currentCell = CellHelper.GetCurrentCell(transform);
+        currentCells = CellHelper.GetCellsAround(transform);
         GetCurrentCell();
     }
 
-    private void GetCurrentCell()
+    public void GetCurrentCell()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.up*-1, out hit,LayerMask.NameToLayer("Ground")))
+        if (Physics.Raycast(transform.position, transform.up*-1, out hit,LayerMask.GetMask("Ground")))
         {
             MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
             var cell = monohit as Cell;
@@ -29,18 +33,37 @@ public class Item : MonoBehaviour, IClickable, IStealable
 
     public void LeftClicked()
     {
+        Debug.Log("Im being clicked!!");
         Character character = GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer];
         //If player next to object getstolen
-        if (character.currentCell == currentCell)
+        if (Vector3.Distance(character.currentCell.myTransform.position, currentCell.myTransform.position) <= 2)
         {
             character.AddActionToQueue(GetStolen(character.transform));
         }
         else //else queue movement to nearest grid
         {
-            character.AddActionToQueue(character.QueuedMove(transform));
+            character.AddActionToQueue(character.QueuedMove(getNearestGrid(currentCell.myTransform)));
             character.AddActionToQueue(GetStolen(character.transform));
         }
         character.StartActions();
+    }
+
+    Transform getNearestGrid(Transform trsfm)
+    {
+        List<float> distances = new List<float>();
+        for (int i = 0; i < currentCells.Length; i++)
+        {
+            distances.Add(Vector3.Distance(currentCells[i].myTransform.position, trsfm.position));
+        }
+        float minDistance = distances.Min();
+        for (int i = 0; i < currentCells.Length; i++)
+        {
+            if (distances[i] <= minDistance + 0.1f && distances[i] >= minDistance - 0.1f)
+            {
+                return currentCells[i].myTransform;
+            }
+        }
+        return null;
     }
 
     public void RightClicked()

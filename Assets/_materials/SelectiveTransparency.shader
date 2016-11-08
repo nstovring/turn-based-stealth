@@ -2,7 +2,6 @@
 	Properties {
 		_Color ("Color", Color) = (1,1,1,1)
 		_MainTex ("Albedo (RGB)", 2D) = "white" {}
-		_PlayerPos("Player Position", Vector) = (0,0,0,0)
 		_Radius("Radius", Range(0.5,1)) = 0.5
 		_RadiusColor("Radius Color", Color) = (1,1,1,1)
 		_Cutoff("Cut Off", float) = 0.5
@@ -22,6 +21,7 @@
 		#pragma target 3.0
 
 		sampler2D _MainTex;
+		float3 _PlayerPosition;
 
 		struct Input {
 			float2 uv_MainTex;
@@ -29,7 +29,7 @@
 			float3 viewDir;
 		};
 
-		float3 _PlayerPos;
+		//float3 _PlayerPos;
 		float _Radius;
 		fixed4 _Color;
 		fixed4 _RadiusColor;
@@ -37,8 +37,8 @@
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
 			fixed4 c;
-			float dist = distance(_PlayerPos, IN.worldPos) *_Radius;
-			float3 playerToPixel = _PlayerPos- IN.worldPos;
+			float dist = distance(_PlayerPosition, IN.worldPos) *_Radius;
+			float3 playerToPixel = _PlayerPosition - IN.worldPos;
 			float dotProd = saturate(dot(playerToPixel,IN.viewDir));
 			float gradientFallOff = dist * max(0.2,dotProd);
 
@@ -74,14 +74,17 @@
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
 			// Albedo comes from a texture tinted by color
+			_PlayerPos.y = 0;
+			float3 worldPos = IN.worldPos;
+			worldPos.y = 0;
 			fixed4 c;
-			float dist = distance(_PlayerPos, IN.worldPos) *_Radius;
-			float3 playerToPixel = _PlayerPos- IN.worldPos;
+			float dist = distance(_PlayerPos, worldPos) *_Radius;
+			float3 playerToPixel = _PlayerPos- worldPos;
 			float dotProd = saturate(dot(playerToPixel,IN.viewDir));
 			float gradientFallOff = dist * max(0.2,dotProd);
 
 			c = _Color;
-			c.a = gradientFallOff;
+			c.a = saturate(gradientFallOff);
 			o.Albedo = c.rgb;
 			// Metallic and smoothness come from slider variables
 			o.Alpha = c.a;

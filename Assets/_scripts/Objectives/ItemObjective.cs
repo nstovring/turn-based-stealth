@@ -9,6 +9,10 @@ public class ItemObjective : Item, IWinable {
     void Start()
     {
         //objectiveChain = new IWinable[0];
+        //currentCell = CellHelper.GetCurrentCell(transform);
+        currentCells = CellHelper.GetCellsAround(transform);
+        GetCurrentCell();
+        
         ObjectiveIsSpawned();
     }
 

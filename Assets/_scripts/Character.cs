@@ -17,8 +17,10 @@ public class Character : MonoBehaviour, IClickable
     public Cell currentCell;
     public NavMeshAgent myAgent;
     public int coneSize = 5;
-    public List<Transform> visionCone;
+    public List<Cell> visionCone;
 
+    [HideInInspector]
+    public Transform myTransform;
     [Range(0,1)]
     public int viewType;
 
@@ -53,28 +55,28 @@ public class Character : MonoBehaviour, IClickable
         return 0.0f;
     }
 
-    public Vector3 GetDirection(Vector3 desiredDirection)
+    public Vector3 GetClampedDirection(Vector3 desiredDirection)
     {
-        float angle = Vector3.Angle(transform.forward, desiredDirection);
+        float angle = Vector3.Angle(myTransform.forward, desiredDirection);
         if (angle > 135)
         {
             myOrientation = orientation.Backwards;
-            return transform.forward * -1;
+            return myTransform.forward * -1;
         }
         if (angle < 45)
         {
             myOrientation = orientation.Forward;
-            return transform.forward;
+            return myTransform.forward;
         }
-        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) > 0)
+        if (angle > 45 && angle < 135 && AngleDir(myTransform.forward, desiredDirection, myTransform.up) > 0)
         {
             myOrientation = orientation.Right;
-            return transform.right;
+            return myTransform.right;
         }
-        if (angle > 45 && angle < 135 && AngleDir(transform.forward, desiredDirection, transform.up) < 1)
+        if (angle > 45 && angle < 135 && AngleDir(myTransform.forward, desiredDirection, myTransform.up) < 1)
         {
             myOrientation = orientation.Left;
-            return transform.right * -1;
+            return myTransform.right * -1;
         }
         Debug.Log("No valid Direction Found!");
         return Vector3.zero;
@@ -82,10 +84,11 @@ public class Character : MonoBehaviour, IClickable
 
     public virtual void Initialize()
     {
-        currentCell = CellHelper.GetCurrentCell(transform);
+        myTransform = transform;
+        currentCell = CellHelper.GetCurrentCell(myTransform);
     }
 
-    public Vector3[] GetPathfindingVector3s(Vector3 targetPosition)
+    public Vector3[] GetPathfindingVector3Array(Vector3 targetPosition)
     {
         myAgent.enabled = true;
         myAgent.Resume();
@@ -104,23 +107,20 @@ public class Character : MonoBehaviour, IClickable
     }
 
 
-    public Transform GetClosestCellTransform(Transform endPosition)
+    public Cell GetClosestCell(Transform endPosition)
     {
-        RaycastHit hit;
-        Vector3[] cornerArray = GetPathfindingVector3s(endPosition.position);
+        //RaycastHit hit;
+        Vector3[] cornerArray = GetPathfindingVector3Array(endPosition.position);
         if (cornerArray.Length < 2)
             return null;
-        Vector3 cornerDirection = cornerArray[1] - transform.position;
-        Vector3 clampedDirection = GetDirection(cornerDirection);
-        Vector3 tempPosVector3 = transform.position + clampedDirection * currentCell.transform.localScale.z;
-        Debug.DrawRay(tempPosVector3, clampedDirection, Color.red,1f);
-        Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,1f);
+        Vector3 cornerDirection = cornerArray[1] - myTransform.position;
+        Vector3 clampedDirection = GetClampedDirection(cornerDirection);
+        //Vector3 tempPosVector3 = myTransform.position + clampedDirection * currentCell.myTransform.localScale.z;
+        //Debug.DrawRay(tempPosVector3, clampedDirection, Color.red,1f);
+        //Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,1f);
 
-        if (Physics.Raycast(tempPosVector3, Vector3.down, out hit,LayerMask.NameToLayer("Ground")))
-        {
-            return hit.transform;
-        }
-        return null;
+        return CellHelper.GetCellFromDirection(myTransform.position,clampedDirection, 1, solidLayer);
+        //return CellHelper.GetCellAtVector(tempPosVector3);
     }
 
 
@@ -137,7 +137,6 @@ public class Character : MonoBehaviour, IClickable
     public virtual void CancelActions()
     {
         StopCoroutine(ExecuteActions());
-        //StopAllCoroutines();
         myCoroutine = null;
     }
 
@@ -167,39 +166,47 @@ public class Character : MonoBehaviour, IClickable
     public virtual IEnumerator QueuedMove(Transform finalDestination)
     {
         visualizeViewRange(false);
-        Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, transform.position.y, finalDestination.position.z);
-        while (Vector3.Distance(transform.position, tempfinalDestination) > 0.1f && ActionPointsLeft())
+        Vector3 tempfinalDestination = new Vector3(finalDestination.position.x, myTransform.position.y, finalDestination.position.z);
+        while (Vector3.Distance(myTransform.position, tempfinalDestination) > 0.1f && ActionPointsLeft())
         {
-            yield return StartCoroutine(Move(GetClosestCellTransform(finalDestination)));
+            Cell closestCell = GetClosestCell(finalDestination);
+            if (closestCell)
+            {
+                yield return StartCoroutine(Move(closestCell.myTransform));
+            }
+            else
+            {
+                Debug.Log("Stop movement");
+                actionPoints = 0;
+                CancelActions();
+            }
         }
-        destinationReached = currentCell.transform == finalDestination;
+        destinationReached = currentCell.myTransform == finalDestination;
         visualizeViewRange(true);
     }
 
     public virtual IEnumerator Move(Transform destination)
     {
-        //visualizeViewRange(false);
 
-        Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
-        Vector3 relativePos = tempDestination - transform.position;
+
+        Vector3 tempDestination = new Vector3(destination.position.x, myTransform.position.y, destination.position.z);
+        Vector3 relativePos = tempDestination - myTransform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
-        while (Vector3.Angle(transform.forward, tempDestination - transform.position) > 0.1f)
+        while (Vector3.Angle(myTransform.forward, tempDestination - myTransform.position) > 0.1f)
         {
-            transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 0.2f);
+            myTransform.rotation = Quaternion.Lerp(myTransform.rotation, rotation, 0.2f);
             yield return new WaitForEndOfFrame();
         }
 
-        //transform.rotation = rotation;
-        while (Vector3.Distance(transform.position, tempDestination) > 0.1f)
+        while (Vector3.Distance(myTransform.position, tempDestination) > 0.1f)
         {
-            tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
-            transform.position = Vector3.Lerp(transform.position, tempDestination, 0.2f);
+            tempDestination = new Vector3(destination.position.x, myTransform.position.y, destination.position.z);
+            myTransform.position = Vector3.MoveTowards(myTransform.position, tempDestination, 0.2f);
             yield return new WaitForEndOfFrame();
         }
 
-        transform.position = tempDestination;
+        myTransform.position = tempDestination;
         ChangeCurrentCell(destination);
-        //visualizeViewRange(true);
         yield return new WaitForEndOfFrame();
 
     }
@@ -214,13 +221,13 @@ public class Character : MonoBehaviour, IClickable
     }
 
 
-    public virtual Transform[] GetVisionConeTransforms(int _coneSize)
+    public virtual Cell[] GetVisionConeTransforms(int _coneSize)
     {
-        List<Transform> tempViewConeList = new List<Transform>();
+        List<Cell> tempViewConeList = new List<Cell>();
 
         for (int i = 0; i < _coneSize; i++)
         {
-            Transform temp = GetCellFromDirection(currentCell.transform.position, transform.forward, i);
+            Cell temp = CellHelper.GetCellFromDirection(currentCell.myTransform.position, myTransform.forward, i, solidLayer);
             if (temp != null)
                 tempViewConeList.Add(temp);
 
@@ -233,8 +240,8 @@ public class Character : MonoBehaviour, IClickable
             
             for (int i = 0; i < coneWidth + 1; i++)
             {
-                Transform tempLeft = GetCellFromDirection(cell.transform.position, transform.right * -1, i);
-                Transform tempRight = GetCellFromDirection(cell.transform.position, transform.right, i);
+                Cell tempLeft = CellHelper.GetCellFromDirection(cell.myTransform.position, myTransform.right * -1, i,solidLayer);
+                Cell tempRight = CellHelper.GetCellFromDirection(cell.myTransform.position, myTransform.right, i, solidLayer);
                 if (tempRight)
                     tempViewConeList.Add(tempRight);
                 if (tempLeft)
@@ -245,30 +252,13 @@ public class Character : MonoBehaviour, IClickable
         return tempViewConeList.ToArray();
     }
 
-    public virtual Transform GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance)
-    {
-        RaycastHit hit;
-        if (!Physics.Raycast(startPosition + transform.up * 1, direction, distance * 2, solidLayer))
-        {
-            if (Physics.Raycast(startPosition + transform.up * 2 + direction * 2 * distance, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
-            {
-                MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
-                var cell = monohit as Cell;
-                if (cell != null)
-                {
-                    return hit.transform;
-                }
-            }
-        }
-        return null;
-    }
-
+ 
     public virtual void visualizeViewRange(bool isWithinView)
     {
         visionCone= GetVisionConeTransforms(coneSize).ToList();
-        foreach (var visionConeTransform in visionCone)
+        foreach (var visionConeCell in visionCone)
         {
-            visionConeTransform.GetComponent<Cell>().SetActiveViewEdge(viewType, isWithinView);
+            visionConeCell.SetActiveViewEdge(viewType, isWithinView);
         }
     }
 

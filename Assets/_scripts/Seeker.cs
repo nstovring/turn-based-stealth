@@ -5,19 +5,18 @@ using System.Collections.Generic;
 public class Seeker : Character
 {
     private Character parentCharacter;
-    public Transform[] path;
+    public Cell[] path;
 	// Use this for initialization
 	void Start ()
 	{
+        Initialize();
 	    parentCharacter = transform.parent.GetComponent<Character>();
         actionPoints = parentCharacter.totalActionPoints;
         totalActionPoints = parentCharacter.totalActionPoints;
-
-        currentCell = CellHelper.GetCurrentCell(transform);
 	}
-    public Transform[] GetPathToDestination(Transform endCell)
+    public Cell[] GetPathToDestination(Transform endCell)
     {
-        List<Transform> tempList = new List<Transform>();
+        List<Cell> tempList = new List<Cell>();
         if (parentCharacter.actionPoints <= 0)
         {
             actionPoints = parentCharacter.totalActionPoints*2;
@@ -30,10 +29,14 @@ public class Seeker : Character
         {
             for (int i = 0; i < actionPoints; i++)
             {
-                Transform cell = GetClosestCellTransform(endCell);
+                Cell cell = GetClosestCell(endCell);
                 if (cell && !tempList.Contains(cell))
                 {
                     tempList.Add(MoveSeeker(cell));
+                }
+                else
+                {
+                    break;
                 }
             }
         }
@@ -47,7 +50,7 @@ public class Seeker : Character
             path = GetPathToDestination(endTransform);
             foreach (var cell in path)
             {
-                cell.GetComponent<Cell>().SetActiveViewEdge((parentCharacter.viewType+2)%4, true);
+                cell.SetActiveViewEdge((parentCharacter.viewType+2)%4, true);
             }
         }
     }
@@ -58,24 +61,27 @@ public class Seeker : Character
         transform.position = transform.parent.position;
         foreach (var cell in path)
         {
-            cell.GetComponent<Cell>().SetActiveViewEdge((parentCharacter.viewType + 2) % 4, false);
+            cell.SetActiveViewEdge((parentCharacter.viewType + 2) % 4, false);
         }
     }
 
-    public Transform MoveSeeker(Transform destination)
+    public Cell MoveSeeker(Cell destination)
     {
-        Vector3 tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
+        Transform cellTransform = destination.myTransform;
+        Vector3 tempDestination = new Vector3(cellTransform.position.x, transform.position.y, cellTransform.position.z);
         Vector3 relativePos = tempDestination - transform.position;
         Quaternion rotation = Quaternion.LookRotation(relativePos);
         
         transform.rotation = rotation;
         
-        tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
+        //tempDestination = new Vector3(destination.position.x, transform.position.y, destination.position.z);
 
         transform.position = tempDestination;
-        currentCell = destination.GetComponent<Cell>();
+        currentCell = destination;
         actionPoints--;
-        return currentCell.transform;
+        if(currentCell)
+        return currentCell;
+        return null;
     }
     // Update is called once per frame
     void Update () {
