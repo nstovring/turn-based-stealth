@@ -9,6 +9,9 @@ public class StormFlashes : MonoBehaviour
     public float longDelay = 5;
     public float shortDelay = 0.5f;
 
+    public AudioClip Rain;
+    public AudioClip[] ThunderClaps;
+
     // Use this for initialization
     void Start ()
     {

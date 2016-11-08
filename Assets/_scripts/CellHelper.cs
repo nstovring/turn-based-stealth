@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public static class CellHelper {
 
@@ -8,6 +9,7 @@ public static class CellHelper {
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up * 1, Vector3.down, out hit, LayerMask.GetMask("Ground")))
         {
+            Debug.Log("Hit Ground");
             MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
             var cell = monohit as Cell;
             if (cell != null)
@@ -37,7 +39,7 @@ public static class CellHelper {
 
         for (int i = 0; i < directions.Length; i++)
         {
-            if (Physics.Raycast(transform.position + transform.up * 1 + directions[i], transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
+            if (Physics.Raycast(transform.position + transform.up * 1 + directions[i], transform.up * -1, out hit, LayerMask.GetMask("Ground")))
             {
                 MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
                 var cell = monohit as Cell;
@@ -53,22 +55,22 @@ public static class CellHelper {
     public static Cell[] GetCellsAround(Transform transform)
     {
         RaycastHit hit;
-        Cell[] tempCells = new Cell[4];
+        List<Cell> tempCells = new List<Cell>();
         Vector3[] directions = {Vector3.back, Vector3.forward, Vector3.left, Vector3.right};
 
         for (int i = 0; i < directions.Length; i++)
         {
-            if (Physics.Raycast(transform.position + transform.up * 1 + directions[i], transform.up * -1, out hit, LayerMask.NameToLayer("Ground")))
+            if (Physics.Raycast(transform.position + transform.up * 1 + directions[i]*2, transform.up * -1, out hit, LayerMask.GetMask("Ground")))
             {
                 MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
                 var cell = monohit as Cell;
                 if (cell != null)
                 {
-                    tempCells[i] = cell;
+                    tempCells.Add(cell);
                 }
             }
         }
-        return tempCells;
+        return tempCells.ToArray();
     }
 
 
@@ -77,7 +79,7 @@ public static class CellHelper {
         RaycastHit hit;
         if (!Physics.Raycast(startPosition + Vector3.up * 1, direction, distance * 2, solidLayerMask))
         {
-            if (Physics.Raycast(startPosition + Vector3.up * 2 + direction * 2 * distance, Vector3.down, out hit, LayerMask.GetMask("Ground")))
+            if (Physics.Raycast(startPosition + Vector3.up * 2 + direction * 2 * distance, Vector3.down, out hit, 1 << LayerMask.NameToLayer("Ground"))) //LayerMask.GetMask("Ground")))
             {
                 MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
                 var cell = monohit as Cell;

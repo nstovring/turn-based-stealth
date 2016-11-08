@@ -60,8 +60,6 @@ public class InputManager : MonoBehaviour
                     if (GameManager.Instance.PlayerTurn)
                         GameManager.Instance.PlayerCharacters[GameManager.Instance.currentPlayer].mySeeker.SetPathToDestination(cell.transform);
 
-                  
-
                     mousePositionInWorld = cell.transform.position + new Vector3(0, 1, 0);
                 }
             }

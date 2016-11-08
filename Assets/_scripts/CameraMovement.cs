@@ -21,8 +21,16 @@ public class CameraMovement : MonoBehaviour
 	    {
 	        
 	    }
-        CameraDistance += new Vector3(Input.GetAxis("Vertical")*-1, 0, Input.GetAxis("Horizontal"));
-	    transform.position = Vector3.Lerp(transform.position,PlayerPosition.position + CameraDistance,0.1f);
+
+	    Vector3 xAxisMovement = transform.right * Input.GetAxis("Horizontal");
+        Vector3 zAxisMovement = (Quaternion.AngleAxis(-45, transform.right) * transform.forward) * Input.GetAxis("Vertical");
+
+        CameraDistance += xAxisMovement +zAxisMovement;
+
+        Vector3 translation = Vector3.Lerp(transform.position, PlayerPosition.position + CameraDistance, 0.1f);
+        //transform.Translate(translation, Space.World);
+	    transform.position = translation;
+
 
 	}
 }

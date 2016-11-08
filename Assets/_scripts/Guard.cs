@@ -62,7 +62,7 @@ public class Guard : Character
                 mySeeker.ResetPosition();
                 isMoving = true;
                 visualizeViewRange(false);
-                Debug.Log("stuff");
+                //Debug.Log("stuff");
                 yield return StartCoroutine(actions.Dequeue());
             }
             else

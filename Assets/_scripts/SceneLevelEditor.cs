@@ -57,17 +57,16 @@ public class SceneLevelEditor : Editor
 
     private static void OnSceneGUI(SceneView sceneview)
     {
-
         if (levelEditMode)
         {
             Event e = Event.current;
-            int controlID = GUIUtility.GetControlID(FocusType.Keyboard);
-            Debug.Log(controlID);
+            int controlID = GUIUtility.GetControlID(FocusType.Passive);
+            //Debug.Log(e.isKey);
             switch (e.GetTypeForControl(controlID))//e.type)
             {
                 case EventType.keyDown:
                     {
-                        Debug.Log("Rotating prefab");
+                        //Debug.Log("Rotating prefab");
 
                         if (e.keyCode == (KeyCode.D))
                         {
@@ -95,6 +94,7 @@ public class SceneLevelEditor : Editor
                         {
                             DestroyImmediate(currentSpawnedPrefab);
                             GoOutOfLevelEditMode();
+                            return;
                         }
                         break;
                     }
