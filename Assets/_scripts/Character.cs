@@ -8,17 +8,21 @@ using Debug = UnityEngine.Debug;
 
 public class Character : MonoBehaviour, IClickable
 {
+    [HideInInspector]
     public Seeker mySeeker;
+    [HideInInspector]
     public GameObject virtCharObjPrefab;
     public int totalActionPoints;
     public int actionPoints;
     public Queue<IEnumerator> actions = new Queue<IEnumerator>();
     public Coroutine myCoroutine;
     public Cell currentCell;
+    [HideInInspector]
     public NavMeshAgent myAgent;
+    [HideInInspector]
     public int coneSize = 5;
+    [HideInInspector]
     public List<Cell> visionCone;
-
     [HideInInspector]
     public Transform myTransform;
     [Range(0,1)]
@@ -109,18 +113,16 @@ public class Character : MonoBehaviour, IClickable
 
     public Cell GetClosestCell(Transform endPosition)
     {
-        //RaycastHit hit;
+        //Make sure to put the result in a separate array to check the length or else it doesnt work
         Vector3[] cornerArray = GetPathfindingVector3Array(endPosition.position);
         if (cornerArray.Length < 2)
             return null;
         Vector3 cornerDirection = cornerArray[1] - myTransform.position;
         Vector3 clampedDirection = GetClampedDirection(cornerDirection);
-        //Vector3 tempPosVector3 = myTransform.position + clampedDirection * currentCell.myTransform.localScale.z;
         //Debug.DrawRay(tempPosVector3, clampedDirection, Color.red,1f);
         //Debug.DrawRay(tempPosVector3, Vector3.down, Color.blue,1f);
-
+       
         return CellHelper.GetCellFromDirection(myTransform.position,clampedDirection, 1, solidLayer);
-        //return CellHelper.GetCellAtVector(tempPosVector3);
     }
 
 
@@ -176,9 +178,11 @@ public class Character : MonoBehaviour, IClickable
             }
             else
             {
-                Debug.Log("Stop movement");
-                actionPoints = 0;
-                CancelActions();
+                //Maybe a closest cell will apear
+                yield return new WaitForSeconds(0.5f);
+                //Debug.Log("Stop movement");
+                actionPoints --;
+                //CancelActions();
             }
         }
         destinationReached = currentCell.myTransform == finalDestination;
@@ -224,23 +228,43 @@ public class Character : MonoBehaviour, IClickable
     public virtual Cell[] GetVisionConeTransforms(int _coneSize)
     {
         List<Cell> tempViewConeList = new List<Cell>();
-
+        List<Cell> tempViewSideConeList = new List<Cell>();
+        int leftSideCells = 0;
+        int rightSideCells = 0;
         for (int i = 0; i < _coneSize; i++)
         {
             Cell temp = CellHelper.GetCellFromDirection(currentCell.myTransform.position, myTransform.forward, i, solidLayer);
             if (temp != null)
+            {
                 tempViewConeList.Add(temp);
-
+                //for (int j = 0; j < i; j++)
+                //{
+                //    Cell tempLeft = CellHelper.GetCellFromDirection(temp.myTransform.position, myTransform.right, j, solidLayer);
+                //    Cell tempRight = CellHelper.GetCellFromDirection(temp.myTransform.position, myTransform.right*-1, j, solidLayer);
+                //    if (tempLeft)
+                //    {
+                //        tempViewSideConeList.Add(tempLeft);
+                //        leftSideCells++;
+                //    }
+                //    if (tempRight)
+                //    {
+                //        tempViewSideConeList.Add(tempRight);
+                //        rightSideCells++;
+                //    }
+                //}
+            }
         }
+
+        //tempViewConeList.Concat(tempViewSideConeList);
         int coneWidth = 1;
         int tempListLength = tempViewConeList.Count;
         for (int index = 0; index < tempListLength; index++)
         {
             var cell = tempViewConeList[index];
-            
+
             for (int i = 0; i < coneWidth + 1; i++)
             {
-                Cell tempLeft = CellHelper.GetCellFromDirection(cell.myTransform.position, myTransform.right * -1, i,solidLayer);
+                Cell tempLeft = CellHelper.GetCellFromDirection(cell.myTransform.position, myTransform.right * -1, i, solidLayer);
                 Cell tempRight = CellHelper.GetCellFromDirection(cell.myTransform.position, myTransform.right, i, solidLayer);
                 if (tempRight)
                     tempViewConeList.Add(tempRight);

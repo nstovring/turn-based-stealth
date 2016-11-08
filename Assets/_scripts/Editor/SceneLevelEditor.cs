@@ -64,11 +64,12 @@ public class SceneLevelEditor : Editor
                 if (currentSpawnedPrefab != spawnablePrefabs[prefabSelector])
                 {
                     Destroy(currentSpawnedPrefab);
-                    currentSpawnedPrefab = Instantiate(spawnablePrefabs[prefabSelector]) as GameObject;
+                    currentSpawnedPrefab = PrefabUtility.InstantiatePrefab(spawnablePrefabs[prefabSelector] as GameObject) as GameObject;
+                    //currentSpawnedPrefab = Instantiate(spawnablePrefabs[prefabSelector]) as GameObject;
                 }
                 if (!currentSpawnedPrefab)
                 {
-                    currentSpawnedPrefab = Instantiate(spawnablePrefabs[prefabSelector]) as GameObject;
+                    currentSpawnedPrefab = PrefabUtility.InstantiatePrefab(spawnablePrefabs[prefabSelector] as GameObject) as GameObject;
                 }
                 currentSpawnedPrefab.transform.position = hit.transform.position;
                 Selection.activeGameObject = currentSpawnedPrefab;

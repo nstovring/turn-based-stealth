@@ -11,9 +11,13 @@ public class Door : MonoBehaviour, IClickable
     private Queue<IEnumerator> queue = new Queue<IEnumerator>();
     public Cell[] myCells;
     private NavMeshObstacle myObstacle;
+
+    public AudioClip[] doorSounds;
+    private AudioSource audioSource;
     // Use this for initialization
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
         myObstacle = GetComponent<NavMeshObstacle>();
         myAnimator = transform.parent.GetComponent<Animator>();
         opened = false;
@@ -33,6 +37,7 @@ public class Door : MonoBehaviour, IClickable
     IEnumerator Open()
     {
         myAnimator.SetBool("opened", true);
+        audioSource.PlayOneShot(doorSounds[0]);
         opened = true;
        
         yield return new WaitForSeconds(1f);
@@ -43,9 +48,12 @@ public class Door : MonoBehaviour, IClickable
 
     IEnumerator Close()
     {
+        audioSource.PlayOneShot(doorSounds[1]);
+        yield return new WaitForSeconds(0.2f);
         myAnimator.SetBool("opened", false);
+        //yield return new WaitForSeconds(0.1f);
         opened = false;
-
+        //yield return new WaitForSeconds(0.2f);
         yield return new WaitForSeconds(1f);
         myObstacle.carving = false;
         //Debug.Log("Door Closed");

@@ -9,7 +9,6 @@ public static class CellHelper {
         RaycastHit hit;
         if (Physics.Raycast(transform.position + Vector3.up * 1, Vector3.down, out hit, LayerMask.GetMask("Ground")))
         {
-            Debug.Log("Hit Ground");
             MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
             var cell = monohit as Cell;
             if (cell != null)
@@ -76,17 +75,13 @@ public static class CellHelper {
 
     public static Cell GetCellFromDirection(Vector3 startPosition, Vector3 direction, int distance, int solidLayerMask)
     {
-        RaycastHit hit;
         if (!Physics.Raycast(startPosition + Vector3.up * 1, direction, distance * 2, solidLayerMask))
         {
-            if (Physics.Raycast(startPosition + Vector3.up * 2 + direction * 2 * distance, Vector3.down, out hit, 1 << LayerMask.NameToLayer("Ground"))) //LayerMask.GetMask("Ground")))
+            RaycastHit hit;
+            if (Physics.Raycast(startPosition + Vector3.up * 2 + direction * 2 * distance, Vector3.down, out hit, LayerMask.GetMask("Ground"))) //LayerMask.GetMask("Ground")))
             {
-                MonoBehaviour monohit = hit.transform.GetComponent<MonoBehaviour>();
-                var cell = monohit as Cell;
-                if (cell != null)
-                {
-                    return cell;
-                }
+                Cell cell = hit.transform.GetComponent<Cell>();
+                return cell;
             }
         }
         return null;

@@ -11,10 +11,14 @@ public class StormFlashes : MonoBehaviour
 
     public AudioClip Rain;
     public AudioClip[] ThunderClaps;
+    private AudioSource rain;
+    public AudioSource thunderClaps;
 
     // Use this for initialization
     void Start ()
     {
+        rain = transform.GetComponent<AudioSource>();
+        //thunderClaps = transform.GetComponentInChildren<AudioSource>();
         StartCoroutine(Flashes());
     }
 
@@ -44,11 +48,16 @@ public class StormFlashes : MonoBehaviour
             }
             while (DirectionalLight.intensity > 0)
             {
-                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.1f);
+                DirectionalLight.intensity = Mathf.Lerp(DirectionalLight.intensity, 0, 0.05f);
                 if (DirectionalLight.intensity < 0.1f)
                     DirectionalLight.intensity = 0;
                 yield return new WaitForEndOfFrame();
             }
+            int randomThunder = Random.Range(0, ThunderClaps.Length);
+            AudioClip selectedClip = ThunderClaps[randomThunder];
+            thunderClaps.clip = selectedClip;
+            thunderClaps.Play();
+            yield return new WaitForSeconds(selectedClip.length);
             yield return new WaitForSeconds(Random.Range(5,longDelay));
         }
         //StopCoroutine(Flashes());

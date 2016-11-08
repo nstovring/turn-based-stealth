@@ -7,11 +7,18 @@ public class LevelManager : MonoBehaviour
 {
     private GameObject[] walls;
     private List<Renderer> wallRenderers;
+
+    private AudioSource myAudioSource;
+    public AudioClip backgroundMusic;
     // Use this for initialization
-    void Start () {
-	    GetWalls();
-	    StartCoroutine(FeedWallsPlayerPos());
-	}
+    void Start ()
+    {
+        myAudioSource = GetComponent<AudioSource>();
+        myAudioSource.clip = backgroundMusic;
+        myAudioSource.Play();
+        //GetWalls();
+        //StartCoroutine(FeedWallsPlayerPos());
+    }
 
     public void GetWalls()
     {
