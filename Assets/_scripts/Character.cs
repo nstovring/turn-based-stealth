@@ -90,6 +90,7 @@ public class Character : MonoBehaviour, IClickable
     {
         myTransform = transform;
         currentCell = CellHelper.GetCurrentCell(myTransform);
+        
     }
 
     public Vector3[] GetPathfindingVector3Array(Vector3 targetPosition)
@@ -309,5 +310,9 @@ public class Character : MonoBehaviour, IClickable
         {
             return true;
         }
+    }
+    public void EndTurn()
+    {
+        actionPoints = 0;
     }
 }
